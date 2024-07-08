@@ -26,6 +26,12 @@ jobs:
         run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v4
+      - name: Copy PWA files
+        run: |
+          cp public/manifest.json dist/
+          cp public/sw.js dist/
+          cp public/icon-192x192.png dist/
+          cp public/icon-512x512.png dist/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
