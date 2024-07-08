@@ -3,8 +3,22 @@ import React from 'react';
 
 function Projects() {
     const projects = [
-        { id: 1, title: 'Chess Anywhere', url: 'https://tkrohde.github.io/', description: 'Chess Anywhere has its roots in an old idea that had been brewing for years. The concept of a URL-encoded chess game had long been a fascinating thought experiment, but it needed the right technology and approach to become a reality.' },
-        { id: 2, title: 'Personal Blog', url: 'https://thomasrohde.github.io/', description: 'This site! A React + Vite project for a personal landing page.' },
+        { 
+            id: 1, 
+            title: 'Chess Anywhere', 
+            url: 'https://tkrohde.github.io/', 
+            description: 'Chess Anywhere has its roots in an old idea that had been brewing for years. The concept of a URL-encoded chess game had long been a fascinating thought experiment, but it needed the right technology and approach to become a reality.' },
+        { 
+            id: 2, 
+            title: 'Personal Blog', 
+            url: 'https://thomasrohde.github.io/', 
+            description: 'This site! A React + Vite project for a personal landing page.' },
+        {
+            id: 3,
+            title: 'Mood tracker',
+            description: 'A simple test project integrated with my home page.',
+            url: 'https://thomasrohde.github.io/mood-tracker'
+          },
     ];
 
     const handleLearnMore = (url) => {
