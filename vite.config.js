@@ -13,8 +13,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: './index.html',
-        blogData: './src/assets/blog-data/posts.json'
+        main: './index.html'
       }
     }
   }

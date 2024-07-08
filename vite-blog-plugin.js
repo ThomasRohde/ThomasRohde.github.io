@@ -1,4 +1,3 @@
-// vite-blog-plugin.js
 import { spawn } from 'child_process';
 import { watch } from 'fs';
 import { dirname, join } from 'path';
@@ -11,6 +10,7 @@ export default function viteBlogPlugin() {
     name: 'vite-blog-plugin',
     configureServer(server) {
       const postsDirectory = join(__dirname, 'src', 'blog-posts');
+      const outputPath = join(__dirname, 'public', 'posts.json');
       
       console.log(`Watching directory: ${postsDirectory}`);
       
@@ -24,12 +24,6 @@ export default function viteBlogPlugin() {
           process.on('close', (code) => {
             if (code === 0) {
               console.log('Blog posts processed successfully.');
-              // Force Vite to re-read the posts.json file
-              const postsJsonPath = join(__dirname, 'src', 'assets', 'blog-data', 'posts.json');
-              server.watcher.add(postsJsonPath);
-              server.watcher.emit('change', postsJsonPath);
-              
-              // Trigger HMR update
               server.ws.send({
                 type: 'full-reload',
                 path: '*'

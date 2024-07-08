@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const postsDirectory = join(__dirname, '..', 'src', 'blog-posts');
-const outputDirectory = join(__dirname, '..', 'src', 'assets', 'blog-data');
+const outputDirectory = join(__dirname, '..', 'public');
 
 const checkDirectory = async (path) => {
   try {

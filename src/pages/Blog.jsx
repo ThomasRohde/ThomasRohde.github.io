@@ -6,12 +6,16 @@ function Blog() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch('/src/assets/blog-data/posts.json');
-      if (response.ok) {
-        const data = await response.json();
-        setPosts(data);
-      } else {
-        console.error('Failed to fetch blog posts');
+      try {
+        const response = await fetch('/posts.json');
+        if (response.ok) {
+          const data = await response.json();
+          setPosts(data);
+        } else {
+          console.error('Failed to fetch blog posts');
+        }
+      } catch (error) {
+        console.error('Error fetching posts:', error);
       }
     };
 
