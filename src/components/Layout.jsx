@@ -49,7 +49,7 @@ function Layout({ children }) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Thomas Rohde's Portfolio
+            Thomas Klok Rohde
           </Typography>
         </Toolbar>
       </AppBar>

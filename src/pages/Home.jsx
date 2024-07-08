@@ -3,7 +3,7 @@ import { styled } from '@mui/system';
 import React from 'react';
 
 const HeroSection = styled(Box)(({ theme }) => ({
-  minHeight: '100vh',
+  minHeight: '300px',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -36,10 +36,7 @@ function Home() {
               About Me
             </Typography>
             <Typography variant="body1" paragraph>
-              I'm a passionate full-stack developer with a keen eye for user experience. 
-              With years of experience in building robust and scalable web applications, 
-              I strive to create digital solutions that not only meet technical requirements 
-              but also delight users.
+              I am a Computer Scientist, with a master degree in Artifical Intelligence and Voice Recognition (although it is 30+ years old). My day job is Enterprise Architect.
             </Typography>
           </Grid>
           <Grid item xs={12} md={6}>
@@ -47,11 +44,8 @@ function Home() {
               My Skills
             </Typography>
             <Typography variant="body1" component="ul">
-              <li>JavaScript (React, Node.js)</li>
-              <li>Python (Django, Flask)</li>
-              <li>Database Design (SQL, NoSQL)</li>
-              <li>UI/UX Design</li>
-              <li>DevOps & Cloud Services</li>
+              <li>ArchiMate and the Archi tool</li>
+              <li>Python, JavaScript, Excel, Power Query</li>
             </Typography>
           </Grid>
         </Grid>

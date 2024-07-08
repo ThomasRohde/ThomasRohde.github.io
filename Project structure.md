@@ -20,6 +20,7 @@
       - deploy.yml
   - node_modules/
   - public/
+    - posts.json
     - vite.svg
   - scripts/
     - process-blog-posts.js
@@ -30,8 +31,6 @@
     - main.jsx
     - assets/
       - react.svg
-      - blog-data/
-        - posts.json
     - blog-posts/
       - 2023-07-08-2nd-post.md
       - 2023-07-08-launching-my-new-portfolio-and-blog.md
