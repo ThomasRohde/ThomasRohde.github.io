@@ -38,8 +38,4 @@ The entire site, including this blog post, is automatically built and deployed w
 
 I want to give a special shout-out to Claude, the AI assistant from Anthropic, who helped me design and implement this website and blog system. Claude provided guidance on the project structure, component design, and the clever blog post processing system. While the actual coding and content creation was done by me, Claude's suggestions and explanations were instrumental in bringing this project to life.
 
-## What's Next?
-
-In the coming weeks and months, I'll be using this blog to share my thoughts on web development, showcase new projects, and discuss interesting technologies I'm exploring. Stay tuned for more content, and feel free to reach out if you have any questions or just want to connect!
-
 Thank you for visiting, and I hope you enjoy exploring the site!
