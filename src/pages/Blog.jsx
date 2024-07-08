@@ -1,28 +1,45 @@
-import { Container, List, ListItem, ListItemText, Typography } from '@mui/material';
-import React from 'react';
+import { Card, CardContent, Container, Grid, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 
 function Blog() {
-  const posts = [
-    { id: 1, title: 'First Blog Post', date: '2023-07-08' },
-    { id: 2, title: 'Second Blog Post', date: '2023-07-15' },
-    // Add more blog posts as needed
-  ];
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const response = await fetch('/src/assets/blog-data/posts.json');
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data);
+      } else {
+        console.error('Failed to fetch blog posts');
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
     <Container>
       <Typography variant="h2" component="h1" gutterBottom>
         My Blog
       </Typography>
-      <List>
+      <Grid container spacing={4}>
         {posts.map((post) => (
-          <ListItem key={post.id}>
-            <ListItemText 
-              primary={post.title}
-              secondary={post.date}
-            />
-          </ListItem>
+          <Grid item xs={12} key={post.slug}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5" component="h2">
+                  {post.title}
+                </Typography>
+                <Typography color="textSecondary" gutterBottom>
+                  {new Date(post.date).toLocaleDateString()}
+                </Typography>
+                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </List>
+      </Grid>
     </Container>
   );
 }

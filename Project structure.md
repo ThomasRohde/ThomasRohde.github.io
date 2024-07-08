@@ -10,7 +10,10 @@
   - package-lock.json
   - Project structure.md
   - README.md
+  - test-output.txt
+  - test-script.js
   - vite.config.js
+  - vite-blog-plugin.js
   - .git/
   - .github/
     - workflows/
@@ -18,6 +21,8 @@
   - node_modules/
   - public/
     - vite.svg
+  - scripts/
+    - process-blog-posts.js
   - src/
     - App.css
     - App.jsx
@@ -25,6 +30,11 @@
     - main.jsx
     - assets/
       - react.svg
+      - blog-data/
+        - posts.json
+    - blog-posts/
+      - 2023-07-08-2nd-post.md
+      - 2023-07-08-launching-my-new-portfolio-and-blog.md
     - components/
       - Layout.jsx
     - pages/
