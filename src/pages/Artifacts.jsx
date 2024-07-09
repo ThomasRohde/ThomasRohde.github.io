@@ -15,7 +15,13 @@ function Artifacts() {
         title: 'Color Palette Showcase',
         description: 'A component showcasing various color palettes.',
         component: React.lazy(() => import('./artifacts/ColorPaletteShowcase'))
-      }
+      },
+      {
+        id: 'petri-dish',
+        title: 'Simulation of organic life',
+        description: 'What happens in a Petri dish, stays (hopefully) in the Petri dish.',
+        component: React.lazy(() => import('./artifacts/PetriDish'))
+      },
       // Add more artifacts here as you create them
     ]);
   }, []);
