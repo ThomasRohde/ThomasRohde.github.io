@@ -32,6 +32,9 @@ jobs:
           cp public/sw.js dist/
           cp public/icon-192x192.png dist/
           cp public/icon-512x512.png dist/
+          cp public/icon-180x180.png dist/
+          cp public/icon-167x167.png dist/
+          cp public/icon-152x152.png dist/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
