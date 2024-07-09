@@ -9,11 +9,11 @@ import Projects from './pages/Projects';
 
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#3f51b5', // Indigo
-    },
     secondary: {
-      main: '#f50057', // Pink
+      main: '#9b59b6', // Indigo
+    },
+    primary: {
+      main: '#3498db', // Pink
     },
   },
   typography: {
