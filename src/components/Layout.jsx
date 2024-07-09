@@ -4,7 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import WorkIcon from '@mui/icons-material/Work';
 import { AppBar, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -12,9 +12,17 @@ function Layout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
   };
 
   const drawer = (
@@ -26,7 +34,7 @@ function Layout({ children }) {
           { text: 'Projects', icon: <WorkIcon />, path: '/projects' },
           { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
         ].map((item) => (
-          <ListItem button key={item.text} component={Link} to={item.path}>
+          <ListItem button key={item.text} onClick={() => handleNavigation(item.path)}>
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>

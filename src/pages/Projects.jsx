@@ -28,7 +28,7 @@ function Projects() {
     return (
         <Container>
             <Typography variant="h2" component="h1" gutterBottom>
-                My Projects
+                Projects
             </Typography>
             <Grid container spacing={4}>
                 {projects.map((project) => (

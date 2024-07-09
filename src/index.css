@@ -11,8 +11,26 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Add this new variable for focus outline */
+  --focus-visible-outline: 2px solid #646cff; /* Using your link color */
 }
 
+/* Add these new focus-related styles */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: var(--focus-visible-outline);
+}
+
+/* This will hide the focus indicator for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Your existing styles */
 a {
   font-weight: 500;
   color: #646cff;
@@ -49,9 +67,10 @@ button {
 button:hover {
   border-color: #646cff;
 }
-button:focus,
+
+/* Update button focus styles to use the new focus-visible approach */
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: var(--focus-visible-outline);
 }
 
 @media (prefers-color-scheme: light) {

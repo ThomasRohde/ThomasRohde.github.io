@@ -10,10 +10,10 @@ import Projects from './pages/Projects';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: '#3f51b5', // Indigo
     },
     secondary: {
-      main: '#dc004e',
+      main: '#f50057', // Pink
     },
   },
   typography: {
