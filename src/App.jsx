@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
+import Artifacts from './pages/Artifacts';
 import Blog from './pages/Blog';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
@@ -41,6 +42,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/artifacts" element={<Artifacts />} /> 
             <Route path="/blog" element={<Blog />} />
           </Routes>
         </Layout>

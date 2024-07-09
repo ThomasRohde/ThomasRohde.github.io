@@ -1,4 +1,5 @@
 import ArticleIcon from '@mui/icons-material/Article';
+import CodeIcon from '@mui/icons-material/Code'; // Add this line
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import WorkIcon from '@mui/icons-material/Work';
@@ -32,6 +33,7 @@ function Layout({ children }) {
         {[
           { text: 'Home', icon: <HomeIcon />, path: '/' },
           { text: 'Projects', icon: <WorkIcon />, path: '/projects' },
+          { text: 'Artifacts', icon: <CodeIcon />, path: '/artifacts' },
           { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
         ].map((item) => (
           <ListItem button key={item.text} onClick={() => handleNavigation(item.path)}>
