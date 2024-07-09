@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), viteBlogPlugin(),
   VitePWA({
     registerType: 'autoUpdate',
-    includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png'],
+    includeAssets: ['icon-192x192.png', 'icon-512x512.png', 'icon-180x180.png', 'icon-167x167.png', 'icon-152x152.png'],
     manifest: {
       name: 'Thomas Klok Rohde Portfolio',
       short_name: 'TKR Portfolio',
