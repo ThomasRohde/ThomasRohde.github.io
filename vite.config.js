@@ -38,11 +38,6 @@ export default defineConfig({
           src: '/icon-152x152.png',
           sizes: '152x152',
           type: 'image/png'
-        },
-        {
-          src: '/favicon.png',
-          sizes: '32x32',
-          type: 'image/png'
         }
       ]
     }
