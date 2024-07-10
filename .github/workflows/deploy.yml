@@ -35,6 +35,11 @@ jobs:
           cp public/icon-180x180.png dist/
           cp public/icon-167x167.png dist/
           cp public/icon-152x152.png dist/
+          cp public/favicon.png dist/
+      - name: Set cache headers
+        run: |
+          echo '/*' > dist/_headers
+          echo '  Cache-Control: no-cache' >> dist/_headers
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
