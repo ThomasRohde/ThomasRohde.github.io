@@ -1,14 +1,17 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, Card, CardActions, CardContent, Container, Grid, Typography } from '@mui/material';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+import { Box, Button, Card, CardActions, CardContent, Container, Grid, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 function Artifacts() {
   const [artifacts, setArtifacts] = useState([]);
   const [selectedArtifact, setSelectedArtifact] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    // In a real application, you might fetch this data from an API
-    // For now, we'll use a static list with dynamic imports
     setArtifacts([
       {
         id: 'color-palette-showcase',
@@ -31,13 +34,20 @@ function Artifacts() {
       // Add more artifacts here as you create them
     ]);
   }, []);
+  
 
   const handleSelectArtifact = (artifact) => {
     setSelectedArtifact(artifact);
+    setIsFullscreen(false);
   };
 
   const handleBack = () => {
     setSelectedArtifact(null);
+    setIsFullscreen(false);
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
   };
 
   const ArtifactsDescription = () => (
@@ -51,9 +61,39 @@ function Artifacts() {
     </Box>
   );
 
+  const ArtifactDisplay = ({ artifact }) => (
+    <Box
+      sx={{
+        position: isFullscreen ? 'fixed' : 'relative',
+        top: isFullscreen ? 0 : 'auto',
+        left: isFullscreen ? 0 : 'auto',
+        right: isFullscreen ? 0 : 'auto',
+        bottom: isFullscreen ? 0 : 'auto',
+        width: isFullscreen ? '100vw' : '100%',
+        height: isFullscreen ? '100vh' : '60vh',
+        zIndex: isFullscreen ? theme.zIndex.modal : 'auto',
+        backgroundColor: 'white',
+        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
+        <React.Suspense fallback={<div>Loading...</div>}>
+          <artifact.component />
+        </React.Suspense>
+      </Box>
+      <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+        <IconButton onClick={toggleFullscreen} color="primary">
+          {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+        </IconButton>
+      </Box>
+    </Box>
+  );
+
   if (selectedArtifact) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: 4, pb: 4 }}>
         <Button startIcon={<ArrowBackIcon />} onClick={handleBack} sx={{ mb: 2 }}>
           Back to Artifacts
         </Button>
@@ -63,11 +103,7 @@ function Artifacts() {
         <Typography variant="body1" paragraph>
           {selectedArtifact.description}
         </Typography>
-        <Box my={4}>
-          <React.Suspense fallback={<div>Loading...</div>}>
-            <selectedArtifact.component />
-          </React.Suspense>
-        </Box>
+        <ArtifactDisplay artifact={selectedArtifact} />
       </Container>
     );
   }
