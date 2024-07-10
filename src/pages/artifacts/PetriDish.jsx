@@ -247,7 +247,7 @@ const OrganicParticleSystem = () => {
     <Paper ref={containerRef} elevation={3} style={{ padding: '20px', maxWidth: '800px', margin: 'auto', height: isFullscreen ? '100vh' : 'auto' }}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <Typography variant="h4" gutterBottom>
-          Optimized Organic Particle System
+          Petri Dish
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>

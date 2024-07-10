@@ -22,6 +22,12 @@ function Artifacts() {
         description: 'What happens in a Petri dish, stays (hopefully) in the Petri dish.',
         component: React.lazy(() => import('./artifacts/PetriDish'))
       },
+      {
+        id: 'wordle-clone',
+        title: 'Wordle clone',
+        description: 'A clone of Wordle done in 5 prompts.',
+        component: React.lazy(() => import('./artifacts/Wordle'))
+      },
       // Add more artifacts here as you create them
     ]);
   }, []);
