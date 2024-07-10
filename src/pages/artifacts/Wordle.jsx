@@ -170,26 +170,28 @@ const WordleGame = () => {
         display="flex" 
         flexDirection="column" 
         alignItems="center" 
-        justifyContent="space-between" 
+        justifyContent="flex-start" 
         minHeight="100vh" 
         bgcolor={grey[100]}
         px={2}
         py={3}
       >
-        <Typography variant="h3" component="h1" gutterBottom>
+        <Typography variant="h3" component="h1" mb={2}>
           WORDLE
         </Typography>
         <Box 
           display="flex" 
           flexDirection="column" 
           justifyContent="center" 
+          alignItems="center"
           flexGrow={1}
           width="100%"
-          maxWidth="500px"
+          maxWidth="100vw"
+          mb={4}
         >
-          <Box mb={2}>
+          <Box mb={2} width="100%" maxWidth="min(80vh, 90vw)" display="flex" flexDirection="column" alignItems="center">
             {attempts.map((attempt, attemptIndex) => (
-              <Box key={attemptIndex} display="flex" justifyContent="center" mb={0.5}>
+              <Box key={attemptIndex} display="flex" justifyContent="center" mb={0.5} width="100%">
                 {Array(WORD_LENGTH).fill().map((_, letterIndex) => (
                   <Box
                     key={letterIndex}
@@ -199,7 +201,7 @@ const WordleGame = () => {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    fontSize={{ xs: '1rem', sm: '1.5rem' }}
+                    fontSize={{ xs: '1rem', sm: '1.5rem', md: '2rem', lg: '2.5rem' }}
                     fontWeight="bold"
                     border={1}
                     borderColor={grey[300]}
@@ -234,7 +236,7 @@ const WordleGame = () => {
             ))}
           </Box>
         </Box>
-        <Box width="100%" maxWidth="500px">
+        <Box width="100%" maxWidth="min(80vh, 90vw)" mb={4}>
           {KEYBOARD_LAYOUT.map((row, rowIndex) => (
             <Box key={rowIndex} display="flex" justifyContent="center" mb={0.5}>
               {row.map((key) => (
@@ -246,10 +248,10 @@ const WordleGame = () => {
                   sx={{
                     minWidth: 0,
                     width: key.length > 1 ? '20%' : '9%',
-                    height: { xs: 40, sm: 58 },
+                    height: { xs: 40, sm: 58, md: 66, lg: 72 },
                     mx: '0.5%',
                     p: 0,
-                    fontSize: { xs: '0.7rem', sm: '0.9rem' },
+                    fontSize: { xs: '0.7rem', sm: '0.9rem', md: '1rem', lg: '1.2rem' },
                     bgcolor: keyboardColors[key] || grey[300],
                     color: keyboardColors[key] ? 'white' : 'black',
                     '&:hover': {
@@ -263,6 +265,7 @@ const WordleGame = () => {
             </Box>
           ))}
         </Box>
+        <Box flexGrow={1} />
         <Dialog open={gameOver} onClose={resetGame}>
           <DialogTitle>{gameWon ? 'Congratulations!' : 'Game Over'}</DialogTitle>
           <DialogContent>
