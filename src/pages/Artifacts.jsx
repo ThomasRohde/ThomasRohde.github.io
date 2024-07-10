@@ -31,6 +31,12 @@ function Artifacts() {
         description: 'A clone of Wordle done in 5 prompts.',
         component: React.lazy(() => import('./artifacts/Wordle'))
       },
+      {
+        id: 'tech-radar',
+        title: 'Tech Radar',
+        description: 'A clone of the Thoughtworks technology radar.',
+        component: React.lazy(() => import('./artifacts/Radar'))
+      }
       // Add more artifacts here as you create them
     ]);
   }, []);

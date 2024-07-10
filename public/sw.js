@@ -1,5 +1,5 @@
 // sw.js
-const CACHE_NAME = 'tkr-portfolio-v3';
+const CACHE_NAME = 'tkr-portfolio-v4';
 const RUNTIME = 'runtime';
 
 // Resources to pre-cache
