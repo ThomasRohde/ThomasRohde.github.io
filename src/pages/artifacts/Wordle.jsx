@@ -8,7 +8,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 
@@ -20,7 +20,7 @@ const KEYBOARD_LAYOUT = [
   ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫']
 ];
 
-const theme = createTheme({
+let theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -31,6 +31,7 @@ const theme = createTheme({
     },
   },
 });
+theme = responsiveFontSizes(theme);
 
 const WordleGame = () => {
   const [targetWord, setTargetWord] = useState('');
@@ -55,7 +56,6 @@ const WordleGame = () => {
       const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${WORD_LENGTH}`);
       const data = await response.json();
       setTargetWord(data[0].toUpperCase());
-      console.log(data[0].toUpperCase());
     } catch (error) {
       console.error('Failed to fetch word:', error);
       setAlertMessage('Failed to fetch a new word. Please try again.');
@@ -113,7 +113,7 @@ const WordleGame = () => {
           }
           updateKeyboardColors(currentWord);
           setIsAnimating(false);
-        }, 300); // Delay to allow the last tile to flip
+        }, 300);
       }
     }, 300);
   };
@@ -166,45 +166,77 @@ const WordleGame = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh" bgcolor={grey[100]}>
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        alignItems="center" 
+        justifyContent="space-between" 
+        minHeight="100vh" 
+        bgcolor={grey[100]}
+        px={2}
+        py={3}
+      >
         <Typography variant="h3" component="h1" gutterBottom>
           WORDLE
         </Typography>
-        <Box mb={4}>
-          {attempts.map((attempt, attemptIndex) => (
-            <Box key={attemptIndex} display="flex" justifyContent="center" mb={1}>
-              {Array(WORD_LENGTH).fill().map((_, letterIndex) => (
-                <Box
-                  key={letterIndex}
-                  width={56}
-                  height={56}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  fontSize={24}
-                  fontWeight="bold"
-                  border={1}
-                  borderColor={grey[300]}
-                  bgcolor={getLetterColor(attempt[letterIndex], letterIndex, attemptIndex)}
-                  color={getLetterTextColor(attempt[letterIndex], letterIndex, attemptIndex)}
-                  mx={0.5}
-                  style={{
-                    transition: 'all 0.3s',
-                    transitionDelay: `${letterIndex * 300}ms`,
-                    transform: attemptIndex === currentAttempt && letterIndex <= revealIndices[attemptIndex] ? 'rotateX(180deg)' : 'rotateX(0deg)'
-                  }}
-                >
-                  <span style={{transform: attemptIndex === currentAttempt && letterIndex <= revealIndices[attemptIndex] ? 'rotateX(180deg)' : 'rotateX(0deg)'}}>
-                    {attempt[letterIndex] || ''}
-                  </span>
-                </Box>
-              ))}
-            </Box>
-          ))}
+        <Box 
+          display="flex" 
+          flexDirection="column" 
+          justifyContent="center" 
+          flexGrow={1}
+          width="100%"
+          maxWidth="500px"
+        >
+          <Box mb={2}>
+            {attempts.map((attempt, attemptIndex) => (
+              <Box key={attemptIndex} display="flex" justifyContent="center" mb={0.5}>
+                {Array(WORD_LENGTH).fill().map((_, letterIndex) => (
+                  <Box
+                    key={letterIndex}
+                    width="18%"
+                    height={0}
+                    paddingBottom="18%"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize={{ xs: '1rem', sm: '1.5rem' }}
+                    fontWeight="bold"
+                    border={1}
+                    borderColor={grey[300]}
+                    bgcolor={getLetterColor(attempt[letterIndex], letterIndex, attemptIndex)}
+                    color={getLetterTextColor(attempt[letterIndex], letterIndex, attemptIndex)}
+                    mx="1%"
+                    position="relative"
+                    style={{
+                      transition: 'all 0.3s',
+                      transitionDelay: `${letterIndex * 300}ms`,
+                      transform: attemptIndex === currentAttempt && letterIndex <= revealIndices[attemptIndex] ? 'rotateX(180deg)' : 'rotateX(0deg)'
+                    }}
+                  >
+                    <Box
+                      position="absolute"
+                      top="0"
+                      left="0"
+                      right="0"
+                      bottom="0"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      style={{
+                        transform: attemptIndex === currentAttempt && letterIndex <= revealIndices[attemptIndex] ? 'rotateX(180deg)' : 'rotateX(0deg)'
+                      }}
+                    >
+                      {attempt[letterIndex] || ''}
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            ))}
+          </Box>
         </Box>
-        <Box width="100%" maxWidth={500}>
+        <Box width="100%" maxWidth="500px">
           {KEYBOARD_LAYOUT.map((row, rowIndex) => (
-            <Box key={rowIndex} display="flex" justifyContent="center" mb={1}>
+            <Box key={rowIndex} display="flex" justifyContent="center" mb={0.5}>
               {row.map((key) => (
                 <Button
                   key={key}
@@ -212,9 +244,12 @@ const WordleGame = () => {
                   onClick={() => handleKeyPress(key)}
                   disabled={isAnimating}
                   sx={{
-                    minWidth: key.length > 1 ? 66 : 40,
-                    height: 58,
-                    mx: 0.5,
+                    minWidth: 0,
+                    width: key.length > 1 ? '20%' : '9%',
+                    height: { xs: 40, sm: 58 },
+                    mx: '0.5%',
+                    p: 0,
+                    fontSize: { xs: '0.7rem', sm: '0.9rem' },
                     bgcolor: keyboardColors[key] || grey[300],
                     color: keyboardColors[key] ? 'white' : 'black',
                     '&:hover': {
