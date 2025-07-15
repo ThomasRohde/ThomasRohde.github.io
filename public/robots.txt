@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://thomasrohde.github.io/sitemap.xml
+
+# Disallow crawling of development files
+Disallow: /src/
+Disallow: /*.json
+Disallow: /*.config.js
+Disallow: /*.config.ts
