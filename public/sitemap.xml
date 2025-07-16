@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://thomasrohde.github.io/</loc>
+    <lastmod>2025-01-16T00:00:00.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://thomasrohde.github.io/blog</loc>
+    <lastmod>2025-01-16T00:00:00.000Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://thomasrohde.github.io/blog/kiro-spec-driven-development-philosophy</loc>
+    <lastmod>2025-01-15T00:00:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thomasrohde.github.io/blog/project-foundation-modern-react-typescript-vite</loc>
+    <lastmod>2025-01-15T00:00:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thomasrohde.github.io/blog/spec-driven-development-lessons-learned-methodology-benefits</loc>
+    <lastmod>2024-12-20T00:00:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

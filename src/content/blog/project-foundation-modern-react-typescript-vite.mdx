@@ -1,0 +1,401 @@
+---
+title: 'Project Foundation: Setting Up Modern React with TypeScript and Vite'
+excerpt: 'Learn how to bootstrap a modern React project with TypeScript and Vite, including MDX integration, dependency management, and configuration challenges. A detailed walkthrough of Task 1 from our spec-driven development case study.'
+publishedDate: '2025-01-15'
+tags:
+  [
+    'kiro',
+    'spec-driven-development',
+    'react',
+    'typescript',
+    'vite',
+    'project-setup',
+    'implementation',
+  ]
+category: 'implementation'
+series: 'kiro-spec-driven-development'
+seriesOrder: 5
+featuredImage: '/images/kiro-series/project-foundation.jpg'
+published: true
+---
+
+# Project Foundation: Setting Up Modern React with TypeScript and Vite
+
+Welcome to the implementation phase of our spec-driven development journey! After establishing our requirements, design, and task planning in previous posts, it's time to get our hands dirty with actual code. Today, we're diving deep into **Task 1: Project Foundation Setup**—the critical first step that sets the stage for everything that follows.
+
+This isn't just another "create-react-app" tutorial. This is a detailed exploration of how spec-driven development guides even the most fundamental setup decisions, ensuring our foundation aligns perfectly with our project requirements.
+
+## Task Objective: Building the Right Foundation
+
+From our task specification, the objective is clear: **Initialize a modern React project with TypeScript and Vite that supports our personal landing page and blog requirements.**
+
+But what does "modern" mean in this context? Let's trace this back to our requirements:
+
+- **Requirement 1.1**: Professional landing page with responsive design
+- **Requirement 1.2**: Modern development tooling and build system
+- **Requirement 1.3**: TypeScript for type safety and developer experience
+- **Requirement 1.4**: Component-based architecture with reusable UI elements
+- **Requirement 1.5**: Blog system with MDX support for rich content
+
+These requirements immediately inform our technology choices. We need:
+
+- React 19 for the latest features and performance improvements
+- TypeScript for type safety and better developer experience
+- Vite for fast development and optimized builds
+- MDX support for our blog system
+- A foundation that supports modern CSS frameworks and component libraries
+
+## Implementation Approach: Strategic Technology Selection
+
+### Why Vite Over Create React App?
+
+The choice between Vite and Create React App isn't arbitrary—it's driven by our requirements:
+
+**Build Performance (Requirement 1.2)**: Vite's ES modules-based development server provides instant hot module replacement, crucial for productive development.
+
+**Modern Tooling (Requirement 1.2)**: Vite embraces modern JavaScript features and provides better TypeScript integration out of the box.
+
+**Extensibility (Requirement 1.5)**: Vite's plugin ecosystem makes MDX integration straightforward, essential for our blog system.
+
+### TypeScript Configuration Strategy
+
+Our TypeScript setup needs to balance strictness with productivity:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+```
+
+**Key decisions explained**:
+
+- **Strict mode enabled**: Catches potential issues early, supporting our quality requirements
+- **Path aliases (`@/*`)**: Clean imports that improve code organization
+- **Modern target (ES2020)**: Leverages latest JavaScript features while maintaining broad compatibility
+
+## Step-by-Step Foundation Setup
+
+### Step 1: Project Initialization
+
+```bash
+# Create the project with Vite's React-TypeScript template
+npm create vite@latest personal-landing-page -- --template react-ts
+
+# Navigate to the project directory
+cd personal-landing-page
+
+# Install dependencies
+npm install
+```
+
+This gives us a solid starting point, but we need to customize it for our specific requirements.
+
+### Step 2: Essential Dependencies Installation
+
+Our requirements analysis reveals several key dependencies:
+
+```bash
+# Core routing and navigation (Requirement 4.1, 4.2)
+npm install react-router-dom
+
+# UI framework and styling (Requirement 2.4, 4.3)
+npm install tailwindcss @tailwindcss/typography
+npm install -D tailwindcss postcss autoprefixer
+
+# MDX support for blog system (Requirement 3.1, 3.2)
+npm install @mdx-js/rollup @mdx-js/react
+npm install remark-gfm rehype-pretty-code
+
+# Component library foundation (Requirement 4.3)
+npm install @radix-ui/react-slot class-variance-authority clsx tailwind-merge
+
+# Development tools (Requirement 7.2, 7.3)
+npm install -D @types/node
+npm install -D eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser
+npm install -D prettier
+```
+
+**Dependency rationale**:
+
+- **React Router DOM**: Client-side routing for our multi-page application
+- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **MDX ecosystem**: Enables rich blog content with React components
+- **Radix UI utilities**: Foundation for accessible, customizable components
+- **Development tools**: Linting, formatting, and type checking
+
+### Step 3: Vite Configuration for MDX
+
+The most complex part of our setup is configuring Vite to handle MDX files. This directly supports Requirement 3.1 (blog system with rich content):
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import mdx from '@mdx-js/rollup';
+import remarkGfm from 'remark-gfm';
+import rehypePrettyCode from 'rehype-pretty-code';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [
+    react(),
+    mdx({
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [
+        [
+          rehypePrettyCode,
+          {
+            theme: 'github-dark',
+            keepBackground: false,
+          },
+        ],
+      ],
+    }),
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+});
+```
+
+**Configuration highlights**:
+
+- **MDX plugin integration**: Processes `.mdx` files as React components
+- **GitHub Flavored Markdown**: Supports tables, task lists, and other GitHub features
+- **Syntax highlighting**: Pretty code blocks with GitHub Dark theme
+- **Path aliases**: Clean imports using `@/` prefix
+
+### Step 4: Tailwind CSS Integration
+
+Tailwind CSS setup supports our responsive design requirements (1.1, 2.4):
+
+```javascript
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,mdx}'],
+  theme: {
+    extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: 'none',
+            color: 'inherit',
+            a: {
+              color: 'inherit',
+              textDecoration: 'underline',
+              fontWeight: '500',
+            },
+          },
+        },
+      },
+    },
+  },
+  plugins: [require('@tailwindcss/typography')],
+};
+```
+
+**Key features**:
+
+- **Content scanning**: Includes MDX files for proper class detection
+- **Typography plugin**: Enhanced styling for blog content
+- **Customized prose**: Inherits theme colors for consistent design
+
+## Challenges Encountered and Solutions
+
+### Challenge 1: MDX TypeScript Integration
+
+**Problem**: TypeScript doesn't recognize `.mdx` files by default, causing import errors.
+
+**Solution**: Create a type declaration file:
+
+```typescript
+// src/vite-env.d.ts
+/// <reference types="vite/client" />
+
+declare module '*.mdx' {
+  let MDXComponent: (props: any) => JSX.Element;
+  export default MDXComponent;
+}
+```
+
+This tells TypeScript how to handle MDX imports, enabling type checking while maintaining flexibility.
+
+### Challenge 2: Path Alias Configuration
+
+**Problem**: TypeScript and Vite need consistent path resolution for the `@/` alias.
+
+**Solution**: Synchronize configurations:
+
+```typescript
+// vite.config.ts - Vite resolution
+resolve: {
+  alias: {
+    '@': path.resolve(__dirname, './src'),
+  },
+}
+
+// tsconfig.json - TypeScript resolution
+"baseUrl": ".",
+"paths": {
+  "@/*": ["./src/*"]
+}
+```
+
+Both tools now understand the same path mapping, preventing import issues.
+
+### Challenge 3: ESLint Configuration for Modern Setup
+
+**Problem**: Default ESLint rules don't account for modern React patterns and TypeScript.
+
+**Solution**: Comprehensive ESLint configuration:
+
+```javascript
+// eslint.config.js
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  { ignores: ['dist'] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  }
+);
+```
+
+This configuration supports modern React patterns while maintaining code quality.
+
+## Verification Against Requirements
+
+Let's verify our foundation setup against the specific requirements:
+
+### Requirement 1.1 (Professional Landing Page)
+
+✅ **Fulfilled**: React + TypeScript provides robust component architecture for professional UI
+
+### Requirement 1.2 (Modern Development Tooling)
+
+✅ **Fulfilled**: Vite offers fast development server, optimized builds, and modern JavaScript support
+
+### Requirement 1.3 (Type Safety)
+
+✅ **Fulfilled**: TypeScript strict mode enabled with comprehensive configuration
+
+### Requirement 1.4 (Component Architecture)
+
+✅ **Fulfilled**: React 19 with modern patterns, path aliases for clean organization
+
+### Requirement 1.5 (Blog System Foundation)
+
+✅ **Fulfilled**: MDX integration configured with syntax highlighting and GitHub Flavored Markdown
+
+## Development Workflow Verification
+
+Let's test our setup with a quick development workflow:
+
+```bash
+# Start development server
+npm run dev
+
+# In another terminal, run linting
+npm run lint
+
+# Build for production to verify configuration
+npm run build
+```
+
+**Expected results**:
+
+- Development server starts on `http://localhost:5173`
+- Hot module replacement works instantly
+- TypeScript compilation succeeds without errors
+- Build produces optimized output in `dist/` directory
+
+## Troubleshooting Common Issues
+
+### Issue: "Cannot resolve @/ imports"
+
+**Symptoms**: TypeScript errors on imports using `@/` prefix
+
+**Solution**: Verify both `tsconfig.json` and `vite.config.ts` have matching path configurations
+
+### Issue: "MDX files not recognized"
+
+**Symptoms**: Import errors when importing `.mdx` files
+
+**Solution**: Ensure `vite-env.d.ts` includes MDX module declaration
+
+### Issue: "Tailwind classes not applying"
+
+**Symptoms**: Tailwind utility classes have no effect
+
+**Solution**: Check `tailwind.config.js` content array includes all relevant file extensions
+
+## Key Takeaways
+
+1. **Requirements Drive Technology Choices**: Every dependency and configuration decision traces back to specific project requirements
+
+2. **Foundation Quality Matters**: Time invested in proper setup pays dividends throughout development
+
+3. **Modern Tooling Enables Productivity**: Vite + TypeScript + MDX creates a powerful development environment
+
+4. **Configuration Consistency is Critical**: Ensure all tools (TypeScript, Vite, ESLint) work together harmoniously
+
+5. **Verification is Essential**: Test the complete development workflow before proceeding to implementation
+
+## What's Next
+
+With our solid foundation in place, we're ready to tackle **Task 2: Build System Configuration**. In the next post, we'll dive into advanced Vite configuration, Tailwind CSS customization, and shadcn/ui integration—building upon this foundation to create a complete development environment.
+
+Our foundation setup demonstrates a key principle of spec-driven development: **every technical decision should trace back to specific requirements**. This isn't just about following best practices—it's about making intentional choices that serve our project's actual needs.
+
+---
+
+_This post is part of the "Kiro Spec-Driven Development" series, where we explore structured software development through a real-world case study. Each implementation post shows how specifications guide technical decisions and ensure consistent progress toward project goals._
+
+**Previous**: [From Vibe Coding to Spec-Driven Development: The Kiro Philosophy](/blog/kiro-spec-driven-development-philosophy)
+**Next**: [Spec-Driven Development in Practice: Lessons Learned](/blog/spec-driven-development-lessons-learned-methodology-benefits)
+**Series Overview**: [Kiro Spec-Driven Development Series](/blog?series=kiro-spec-driven-development)

@@ -111,7 +111,7 @@ export default function Navigation() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo/Brand */}
         <Link to="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold">Thomas Rohde</span>
+          <span className="text-xl font-bold">Thomas Klok Rohde</span>
         </Link>
 
         {/* Desktop Navigation */}

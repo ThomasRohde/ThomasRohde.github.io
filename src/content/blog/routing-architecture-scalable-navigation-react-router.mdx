@@ -1,0 +1,568 @@
+---
+title: 'Routing Architecture: Creating Scalable Navigation with React Router'
+excerpt: 'Explore how to build a robust routing and layout architecture with React Router, including responsive navigation, accessibility features, and mobile menu implementation. A detailed walkthrough of Task 3 from our spec-driven development case study.'
+publishedDate: '2025-01-15'
+tags:
+  [
+    'kiro',
+    'spec-driven-development',
+    'react-router',
+    'navigation',
+    'accessibility',
+    'responsive-design',
+    'implementation',
+  ]
+category: 'implementation'
+series: 'kiro-spec-driven-development'
+seriesOrder: 7
+featuredImage: '/images/kiro-series/routing-architecture.jpg'
+published: true
+---
+
+# Routing Architecture: Creating Scalable Navigation with React Router
+
+After establishing our project foundation and configuring our build system, it's time to create the backbone of our application: **routing and layout architecture**. Today we're diving deep into **Task 3: Routing and Layout Structure**—where we transform our static setup into a navigable, accessible, and user-friendly application.
+
+This isn't just about adding React Router and calling it done. This is about creating a thoughtful navigation architecture that serves both users and developers, guided by our specifications and accessibility requirements.
+
+## Task Objective: Building Navigation That Works
+
+From our task specification, the objective is clear: **Create foundational layout and routing architecture that supports our multi-page application with responsive navigation and accessibility compliance.**
+
+Let's trace this back to our requirements to understand what "foundational" means:
+
+- **Requirement 4.1**: Client-side routing for seamless navigation
+- **Requirement 4.2**: Responsive navigation that works on all devices
+- **Requirement 4.3**: Accessible navigation with proper ARIA labels and keyboard support
+- **Requirement 2.4**: Professional layout structure with consistent branding
+- **Requirement 2.5**: Mobile-first responsive design approach
+
+These requirements immediately inform our architectural decisions. We need:
+
+- React Router DOM for client-side navigation
+- A responsive navigation component with mobile menu
+- Proper semantic HTML and accessibility features
+- A layout system that works across all pages
+- Smooth scrolling and section navigation for single-page sections
+
+## Implementation Approach: Architecture-First Design
+
+### Why React Router DOM?
+
+The choice of React Router DOM isn't arbitrary—it's driven by our specific requirements:
+
+**Client-Side Navigation (Requirement 4.1)**: React Router provides seamless navigation without page refreshes, essential for modern web applications.
+
+**Code Splitting Support**: Enables lazy loading of route components, improving initial load performance.
+
+**Nested Routing**: Supports our layout architecture where all pages share common navigation and footer.
+
+**Browser History Integration**: Proper back/forward button support and URL management.
+
+### Layout Architecture Strategy
+
+Our layout follows a nested routing pattern that promotes code reuse and consistency:
+
+```
+App (Router + Error Boundaries)
+└── RootLayout (Navigation + Footer)
+    ├── Home (Landing page sections)
+    ├── Blog (Blog post listing)
+    ├── BlogPost (Individual post)
+    └── NotFound (404 page)
+```
+
+This architecture ensures every page shares the same navigation and footer while allowing page-specific content.
+
+## Step-by-Step Implementation
+
+### Step 1: App.tsx - The Routing Foundation
+
+Our main App component establishes the routing architecture with proper error handling and performance optimizations:
+
+```typescript
+import { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RootLayout from '@/components/RootLayout';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { AccessibilityProvider } from '@/components/AccessibilityProvider';
+
+// Lazy load route components for code splitting
+const Home = lazy(() => import('@/pages/Home'));
+const Blog = lazy(() => import('@/pages/Blog'));
+const BlogPost = lazy(() => import('@/pages/BlogPost'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <AccessibilityProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<RootLayout />}>
+              <Route
+                index
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Home />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="blog"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Blog />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="blog/:slug"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <BlogPost />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <NotFound />
+                  </Suspense>
+                }
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AccessibilityProvider>
+    </ErrorBoundary>
+  );
+}
+```
+
+**Key architectural decisions**:
+
+- **Nested Routes**: All routes are children of RootLayout, ensuring consistent navigation
+- **Lazy Loading**: Route components are loaded on-demand for better performance
+- **Error Boundaries**: Graceful error handling prevents the entire app from crashing
+- **Accessibility Provider**: Centralized accessibility context for the entire application
+- **Suspense Fallbacks**: Loading states while components are being loaded
+
+### Step 2: RootLayout - The Structural Foundation
+
+The RootLayout component provides the consistent structure shared across all pages:
+
+```typescript
+import { Outlet } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import SkipLinks from '@/components/SkipLinks';
+
+export default function RootLayout() {
+  return (
+    <div className="bg-background min-h-screen">
+      <SkipLinks />
+      <Navigation />
+      <main id="main-content" role="main" tabIndex={-1}>
+        <Outlet />
+      </main>
+      <footer
+        id="footer"
+        role="contentinfo"
+        className="bg-muted/30 mt-20 py-12"
+      >
+        {/* Footer content with social links and copyright */}
+      </footer>
+    </div>
+  );
+}
+```
+
+**Accessibility features**:
+
+- **Skip Links**: Allow keyboard users to jump directly to main content
+- **Semantic HTML**: Proper `main`, `footer`, and `role` attributes
+- **Focus Management**: Main content can receive focus for screen readers
+- **Landmark Regions**: Clear page structure for assistive technologies
+
+### Step 3: Navigation Component - The User Interface
+
+The Navigation component is where the complexity really lives. It needs to handle both desktop and mobile experiences while maintaining accessibility:
+
+```typescript
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from '@/components/ui/navigation-menu';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
+export default function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const location = useLocation();
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  const navigationItems = [
+    { name: 'Home', href: '/', section: 'hero' },
+    { name: 'About', href: '/', section: 'about' },
+    { name: 'Blog', href: '/blog' },
+  ];
+```
+
+**State management strategy**:
+
+- **Menu State**: Controls mobile menu visibility
+- **Focus Management**: Tracks keyboard navigation within mobile menu
+- **Location Awareness**: Highlights active navigation items
+- **Refs for Accessibility**: Manages focus between menu button and menu items
+
+### Step 4: Responsive Navigation Logic
+
+The navigation handles both section scrolling (for home page) and route navigation:
+
+```typescript
+const handleNavigation = (item: (typeof navigationItems)[0]) => {
+  if (item.section && location.pathname === '/') {
+    // If we're on the home page and clicking a section link, scroll to section
+    const element = document.getElementById(item.section);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      // Focus the section for screen readers
+      element.focus({ preventScroll: true });
+    }
+  }
+  // For regular navigation (like Blog), React Router will handle it
+};
+
+const isActive = (href: string) => {
+  if (href === '/') {
+    return location.pathname === '/';
+  }
+  return location.pathname.startsWith(href);
+};
+```
+
+**Navigation intelligence**:
+
+- **Context-Aware Behavior**: Different behavior for section links vs. route links
+- **Smooth Scrolling**: Enhanced user experience for single-page navigation
+- **Focus Management**: Ensures screen readers follow navigation actions
+- **Active State Detection**: Visual feedback for current location
+
+### Step 5: Mobile Menu Implementation
+
+The mobile menu requires sophisticated keyboard navigation and accessibility features:
+
+```typescript
+// Handle keyboard navigation for mobile menu
+const handleKeyDown = (event: React.KeyboardEvent) => {
+  if (!isMenuOpen) return;
+
+  switch (event.key) {
+    case 'Escape':
+      setIsMenuOpen(false);
+      menuButtonRef.current?.focus();
+      break;
+    case 'ArrowDown':
+      event.preventDefault();
+      setFocusedIndex((prev) =>
+        prev < navigationItems.length - 1 ? prev + 1 : 0
+      );
+      break;
+    case 'ArrowUp':
+      event.preventDefault();
+      setFocusedIndex((prev) =>
+        prev > 0 ? prev - 1 : navigationItems.length - 1
+      );
+      break;
+    case 'Home':
+      event.preventDefault();
+      setFocusedIndex(0);
+      break;
+    case 'End':
+      event.preventDefault();
+      setFocusedIndex(navigationItems.length - 1);
+      break;
+  }
+};
+```
+
+**Keyboard navigation features**:
+
+- **Escape Key**: Closes menu and returns focus to menu button
+- **Arrow Keys**: Navigate between menu items
+- **Home/End Keys**: Jump to first/last menu items
+- **Focus Trapping**: Keeps keyboard focus within the menu
+
+## Challenges Encountered and Solutions
+
+### Challenge 1: Mobile Menu Focus Management
+
+**Problem**: When the mobile menu opens, keyboard users need proper focus management to navigate effectively.
+
+**Solution**: Implement comprehensive keyboard event handling:
+
+```typescript
+// Close menu when clicking outside
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      isMenuOpen &&
+      mobileMenuRef.current &&
+      !mobileMenuRef.current.contains(event.target as Node) &&
+      !menuButtonRef.current?.contains(event.target as Node)
+    ) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, [isMenuOpen]);
+```
+
+This ensures the menu closes when users click outside, providing intuitive interaction patterns.
+
+### Challenge 2: Section Navigation vs Route Navigation
+
+**Problem**: The navigation needs to handle both smooth scrolling to page sections and traditional route navigation.
+
+**Solution**: Context-aware navigation logic:
+
+```typescript
+const handleNavigation = (item: (typeof navigationItems)[0]) => {
+  if (item.section && location.pathname === '/') {
+    // Smooth scroll to section on home page
+    const element = document.getElementById(item.section);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      element.focus({ preventScroll: true });
+    }
+  }
+  // React Router handles route navigation automatically
+};
+```
+
+This provides seamless user experience whether navigating within a page or between pages.
+
+### Challenge 3: Accessibility Compliance
+
+**Problem**: Navigation must be fully accessible to screen readers and keyboard users.
+
+**Solution**: Comprehensive ARIA attributes and semantic HTML:
+
+```typescript
+<Button
+  ref={menuButtonRef}
+  variant="ghost"
+  size="sm"
+  className="md:hidden"
+  onClick={toggleMenu}
+  aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+  aria-expanded={isMenuOpen}
+  aria-controls="mobile-navigation"
+  aria-haspopup="true"
+>
+```
+
+Every interactive element includes proper ARIA attributes for screen reader compatibility.
+
+### Challenge 4: Responsive Design Consistency
+
+**Problem**: Navigation must work seamlessly across all device sizes while maintaining visual consistency.
+
+**Solution**: Mobile-first responsive design with Tailwind CSS:
+
+```typescript
+{/* Desktop Navigation */}
+<NavigationMenu className="hidden md:flex">
+  {/* Desktop menu items */}
+</NavigationMenu>
+
+{/* Mobile Menu Button */}
+<Button className="md:hidden">
+  {/* Mobile menu toggle */}
+</Button>
+```
+
+Clear breakpoints ensure appropriate navigation patterns for each device size.
+
+## Verification Against Requirements
+
+Let's verify our routing implementation against the specific requirements:
+
+### Requirement 4.1 (Client-side Routing)
+
+✅ **Fulfilled**: React Router DOM provides seamless navigation without page refreshes
+
+### Requirement 4.2 (Responsive Navigation)
+
+✅ **Fulfilled**: Mobile menu with hamburger toggle, desktop horizontal navigation
+
+### Requirement 4.3 (Accessible Navigation)
+
+✅ **Fulfilled**: ARIA labels, keyboard navigation, focus management, semantic HTML
+
+### Requirement 2.4 (Professional Layout)
+
+✅ **Fulfilled**: Consistent branding, sticky navigation, clean visual hierarchy
+
+### Requirement 2.5 (Mobile-first Design)
+
+✅ **Fulfilled**: Mobile menu prioritized, responsive breakpoints, touch-friendly interactions
+
+## Routing Best Practices Demonstrated
+
+### 1. Code Splitting with Lazy Loading
+
+```typescript
+const Home = lazy(() => import('@/pages/Home'));
+const Blog = lazy(() => import('@/pages/Blog'));
+```
+
+**Benefits**:
+
+- Reduces initial bundle size
+- Improves first page load performance
+- Enables progressive loading of application features
+
+### 2. Error Boundary Integration
+
+```typescript
+<ErrorBoundary>
+  <AccessibilityProvider>
+    <BrowserRouter>
+      {/* Routes */}
+    </BrowserRouter>
+  </AccessibilityProvider>
+</ErrorBoundary>
+```
+
+**Benefits**:
+
+- Prevents routing errors from crashing the entire application
+- Provides graceful error handling and user feedback
+- Maintains application stability during navigation
+
+### 3. Nested Route Architecture
+
+```typescript
+<Route path="/" element={<RootLayout />}>
+  <Route index element={<Home />} />
+  <Route path="blog" element={<Blog />} />
+  <Route path="blog/:slug" element={<BlogPost />} />
+</Route>
+```
+
+**Benefits**:
+
+- Consistent layout across all pages
+- Shared navigation and footer components
+- Clean URL structure with proper nesting
+
+### 4. Accessibility-First Design
+
+```typescript
+<nav
+  id="mobile-navigation"
+  className="container mx-auto px-4 py-4"
+  role="navigation"
+  aria-label="Mobile navigation"
+>
+  <div className="flex flex-col space-y-2" role="menu">
+    {navigationItems.map((item, index) => (
+      <Link
+        role="menuitem"
+        tabIndex={focusedIndex === index ? 0 : -1}
+        aria-current={isActive(item.href) ? 'page' : undefined}
+      >
+        {item.name}
+      </Link>
+    ))}
+  </div>
+</nav>
+```
+
+**Benefits**:
+
+- Screen reader compatibility
+- Keyboard navigation support
+- Proper focus management
+- Semantic HTML structure
+
+## Performance Considerations
+
+### Bundle Optimization
+
+Our routing setup includes several performance optimizations:
+
+1. **Lazy Loading**: Route components load only when needed
+2. **Code Splitting**: Automatic bundle splitting by route
+3. **Suspense Boundaries**: Graceful loading states
+4. **Tree Shaking**: Unused code elimination
+
+### Runtime Performance
+
+1. **Memoized Navigation Items**: Prevents unnecessary re-renders
+2. **Event Listener Cleanup**: Proper memory management
+3. **Efficient State Updates**: Minimal re-renders on navigation
+4. **Optimized CSS**: Tailwind's utility classes with minimal runtime overhead
+
+## Testing the Navigation
+
+Let's verify our navigation works correctly:
+
+```bash
+# Start development server
+npm run dev
+
+# Test navigation scenarios:
+# 1. Desktop navigation between routes
+# 2. Mobile menu toggle and keyboard navigation
+# 3. Section scrolling on home page
+# 4. Back/forward browser buttons
+# 5. Direct URL access to routes
+```
+
+**Expected behaviors**:
+
+- Smooth transitions between routes
+- Mobile menu opens/closes properly
+- Keyboard navigation works in mobile menu
+- Active states highlight correctly
+- Section scrolling works on home page
+
+## Key Takeaways
+
+1. **Architecture Matters**: Thoughtful routing architecture pays dividends throughout development
+
+2. **Accessibility is Non-Negotiable**: Proper ARIA attributes and keyboard navigation are essential, not optional
+
+3. **Mobile-First Approach**: Design for mobile constraints first, then enhance for desktop
+
+4. **Performance by Design**: Lazy loading and code splitting should be built in from the start
+
+5. **User Experience Focus**: Navigation should feel intuitive and responsive across all devices
+
+6. **Error Handling**: Robust error boundaries prevent navigation issues from breaking the app
+
+## What's Next
+
+With our routing and navigation architecture in place, we're ready to tackle **Task 4: Hero and About Sections**. In the next post, we'll dive into building engaging content sections that leverage our navigation system and demonstrate how layout components work together.
+
+Our routing implementation demonstrates another key principle of spec-driven development: **accessibility and user experience requirements should drive technical implementation decisions**. We didn't just add React Router—we built a comprehensive navigation system that serves all users effectively.
+
+---
+
+_This post is part of the "Kiro Spec-Driven Development" series, where we explore structured software development through a real-world case study. Each implementation post shows how specifications guide technical decisions and ensure consistent progress toward project goals._
+
+**Previous**: [Build System Mastery: Configuring Vite, Tailwind, and MDX Integration](#)
+**Next**: [Component Design: Building Engaging Hero and About Sections](#)
+**Series Overview**: [Complete Guide to Spec-Driven Development](#)

@@ -12,14 +12,18 @@ export interface SEOProps {
   author?: string;
   tags?: string[];
   category?: string;
+  series?: string;
+  seriesOrder?: number;
+  readTime?: number;
+  wordCount?: number;
 }
 
 const DEFAULT_SEO = {
-  title: 'Thomas Rohde - Full Stack Developer & Tech Enthusiast',
+  title: 'Thomas Klok Rohde - Full Stack Developer & Tech Enthusiast',
   description:
-    'Personal portfolio and blog of Thomas Rohde, a passionate full stack developer sharing insights on modern web development, React, TypeScript, and more.',
+    'Personal portfolio and blog of Thomas Klok Rohde, a passionate full stack developer sharing insights on modern web development, React, TypeScript, and more.',
   keywords: [
-    'Thomas Rohde',
+    'Thomas Klok Rohde',
     'Full Stack Developer',
     'React',
     'TypeScript',
@@ -29,7 +33,7 @@ const DEFAULT_SEO = {
     'Backend',
   ],
   image: '/images/og-image.jpg',
-  author: 'Thomas Rohde',
+  author: 'Thomas Klok Rohde',
   type: 'website' as const,
 };
 
@@ -45,10 +49,16 @@ export function SEO({
   author = DEFAULT_SEO.author,
   tags,
   category,
+  series,
+  seriesOrder,
+  readTime,
+  wordCount,
 }: SEOProps) {
   useEffect(() => {
     // Construct full title
-    const fullTitle = title ? `${title} | Thomas Rohde` : DEFAULT_SEO.title;
+    const fullTitle = title
+      ? `${title} | Thomas Klok Rohde`
+      : DEFAULT_SEO.title;
 
     // Construct canonical URL
     const canonicalUrl = url
@@ -116,7 +126,7 @@ export function SEO({
     updateMetaTag('[property="og:image"]', fullImageUrl, 'property');
     updateMetaTag('[property="og:url"]', canonicalUrl, 'property');
     updateMetaTag('[property="og:type"]', type, 'property');
-    updateMetaTag('[property="og:site_name"]', 'Thomas Rohde', 'property');
+    updateMetaTag('[property="og:site_name"]', 'Thomas Klok Rohde', 'property');
     updateMetaTag('[property="og:locale"]', 'en_US', 'property');
 
     // Twitter Card Tags
@@ -174,9 +184,126 @@ export function SEO({
     updateMetaTag('[name="format-detection"]', 'telephone=no');
     updateMetaTag('[name="theme-color"]', '#000000');
 
+    // Add reading time and word count for articles
+    if (type === 'article' && readTime) {
+      updateMetaTag('[name="twitter:label1"]', 'Reading time');
+      updateMetaTag('[name="twitter:data1"]', `${readTime} min read`);
+    }
+
+    if (type === 'article' && wordCount) {
+      updateMetaTag('[name="twitter:label2"]', 'Word count');
+      updateMetaTag('[name="twitter:data2"]', wordCount.toString());
+    }
+
+    // Structured Data (JSON-LD)
+    const addStructuredData = () => {
+      // Remove existing structured data
+      const existingScript = document.querySelector(
+        'script[type="application/ld+json"]'
+      );
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      let structuredData: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+      };
+
+      if (type === 'article') {
+        structuredData = {
+          ...structuredData,
+          '@type': 'BlogPosting',
+          headline: title || DEFAULT_SEO.title,
+          description: description,
+          image: fullImageUrl,
+          url: canonicalUrl,
+          datePublished: publishedDate,
+          dateModified: updatedDate || publishedDate,
+          author: {
+            '@type': 'Person',
+            name: author,
+            url: 'https://thomasrohde.github.io',
+          },
+          publisher: {
+            '@type': 'Person',
+            name: 'Thomas Klok Rohde',
+            url: 'https://thomasrohde.github.io',
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': canonicalUrl,
+          },
+        };
+
+        // Add series information if available
+        if (series) {
+          structuredData.isPartOf = {
+            '@type': 'BlogPosting',
+            name: series,
+            url: `https://thomasrohde.github.io/series/${series}`,
+          };
+
+          if (seriesOrder) {
+            structuredData.position = seriesOrder;
+          }
+        }
+
+        // Add keywords/tags
+        if (tags && tags.length > 0) {
+          structuredData.keywords = tags.join(', ');
+        }
+
+        // Add reading time
+        if (readTime) {
+          structuredData.timeRequired = `PT${readTime}M`;
+        }
+
+        // Add word count
+        if (wordCount) {
+          structuredData.wordCount = wordCount;
+        }
+
+        // Add category
+        if (category) {
+          structuredData.articleSection = category;
+        }
+      } else {
+        // Website/Person structured data
+        structuredData = {
+          ...structuredData,
+          '@type': 'Person',
+          name: 'Thomas Klok Rohde',
+          url: 'https://thomasrohde.github.io',
+          image: fullImageUrl,
+          description: description,
+          jobTitle: 'Full Stack Developer',
+          knowsAbout: keywords,
+          sameAs: [
+            'https://github.com/thomasrohde',
+            'https://linkedin.com/in/thomasrohde',
+          ],
+        };
+      }
+
+      // Create and append structured data script
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(structuredData, null, 2);
+      document.head.appendChild(script);
+    };
+
+    addStructuredData();
+
     // Cleanup function to reset title when component unmounts
     return () => {
       document.title = DEFAULT_SEO.title;
+      // Remove structured data on cleanup
+      const structuredDataScript = document.querySelector(
+        'script[type="application/ld+json"]'
+      );
+      if (structuredDataScript) {
+        structuredDataScript.remove();
+      }
     };
   }, [
     title,
@@ -190,6 +317,10 @@ export function SEO({
     author,
     tags,
     category,
+    series,
+    seriesOrder,
+    readTime,
+    wordCount,
   ]);
 
   return null;

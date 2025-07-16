@@ -162,6 +162,110 @@ export async function getBlogTags(): Promise<string[]> {
 }
 
 /**
+ * Get blog posts by series
+ */
+export async function getBlogPostsBySeries(
+  seriesName: string
+): Promise<BlogPost[]> {
+  try {
+    const posts = await loadBlogPosts();
+    return posts
+      .filter((post) => post.series === seriesName)
+      .sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0));
+  } catch (error) {
+    console.error(`Error getting blog posts by series ${seriesName}:`, error);
+    return [];
+  }
+}
+
+/**
+ * Get all unique series from blog posts
+ */
+export async function getBlogSeries(): Promise<string[]> {
+  try {
+    const posts = await loadBlogPosts();
+    const series = new Set(
+      posts.filter((post) => post.series).map((post) => post.series!)
+    );
+    return Array.from(series).sort();
+  } catch (error) {
+    console.error('Error getting blog series:', error);
+    return [];
+  }
+}
+
+/**
+ * Get series information including all posts
+ */
+export async function getSeriesInfo(
+  seriesName: string
+): Promise<import('@/lib/blog').SeriesInfo | null> {
+  try {
+    const posts = await getBlogPostsBySeries(seriesName);
+    if (posts.length === 0) return null;
+
+    // Get series description from the first post or use a default
+    const description = getSeriesDescription(seriesName);
+
+    return {
+      name: seriesName,
+      description,
+      posts,
+      totalPosts: posts.length,
+    };
+  } catch (error) {
+    console.error(`Error getting series info for ${seriesName}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Get series navigation for a specific post
+ */
+export async function getSeriesNavigation(post: BlogPost): Promise<{
+  previous: BlogPost | null;
+  next: BlogPost | null;
+  currentIndex: number;
+  totalPosts: number;
+} | null> {
+  if (!post.series) return null;
+
+  try {
+    const seriesPosts = await getBlogPostsBySeries(post.series);
+    const currentIndex = seriesPosts.findIndex((p) => p.slug === post.slug);
+
+    if (currentIndex === -1) return null;
+
+    return {
+      previous: currentIndex > 0 ? seriesPosts[currentIndex - 1] : null,
+      next:
+        currentIndex < seriesPosts.length - 1
+          ? seriesPosts[currentIndex + 1]
+          : null,
+      currentIndex: currentIndex + 1, // 1-based index for display
+      totalPosts: seriesPosts.length,
+    };
+  } catch (error) {
+    console.error(`Error getting series navigation for ${post.slug}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Get series description based on series name
+ */
+function getSeriesDescription(seriesName: string): string {
+  const descriptions: Record<string, string> = {
+    'kiro-spec-driven-development':
+      'A comprehensive guide to Kiro\'s spec-driven development methodology, demonstrating how to transform AI-assisted development from ad-hoc "vibe coding" into structured, repeatable processes through practical examples.',
+  };
+
+  return (
+    descriptions[seriesName] || `A series of blog posts about ${seriesName}.`
+  );
+}
+
+/**
  * Clear the blog posts cache (useful for development)
  */
 export function clearBlogCache(): void {

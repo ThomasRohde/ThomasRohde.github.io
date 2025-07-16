@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document outlines the requirements for creating a modern personal landing page for Thomas Rohde, deployed on GitHub Pages at https://thomasrohde.github.io. The landing page will be built using React + Vite + Tailwind CSS + shadcn/ui stack with MDX support for blog content, providing a professional web presence with both static content and dynamic blog functionality.
+This document outlines the requirements for creating a modern personal landing page for Thomas Klok Rohde, deployed on GitHub Pages at https://thomasrohde.github.io. The landing page will be built using React + Vite + Tailwind CSS + shadcn/ui stack with MDX support for blog content, providing a professional web presence with both static content and dynamic blog functionality.
 
 ## Requirements
 
@@ -20,7 +20,7 @@ This document outlines the requirements for creating a modern personal landing p
 
 ### Requirement 2: Landing Page Content and Layout
 
-**User Story:** As a visitor, I want to see a professional landing page with clear information about Thomas Rohde, so that I can understand his background and expertise.
+**User Story:** As a visitor, I want to see a professional landing page with clear information about Thomas Klok Rohde, so that I can understand his background and expertise.
 
 #### Acceptance Criteria
 

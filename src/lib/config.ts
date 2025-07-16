@@ -5,7 +5,8 @@
 export const config = {
   app: {
     name:
-      import.meta.env.VITE_APP_NAME || 'Thomas Rohde - Personal Landing Page',
+      import.meta.env.VITE_APP_NAME ||
+      'Thomas Klok Rohde - Personal Landing Page',
     version: import.meta.env.VITE_APP_VERSION || '1.0.0',
     env: import.meta.env.VITE_APP_ENV || 'development',
     debug: import.meta.env.VITE_APP_DEBUG === 'true',

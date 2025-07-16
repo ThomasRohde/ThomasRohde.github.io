@@ -8,8 +8,12 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { getBlogPost, loadBlogPosts } from '@/lib/blogService';
-import { formatDate } from '@/lib/blog';
+import {
+  getBlogPost,
+  loadBlogPosts,
+  getSeriesNavigation,
+} from '@/lib/blogService';
+import { formatDate, extractTableOfContents } from '@/lib/blog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -22,7 +26,13 @@ import {
 import { generateBlogPostSEO, seoConfig } from '@/lib/seo';
 import { BlogPostSkeleton } from '@/components/LoadingSpinner';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import type { BlogPost as BlogPostType } from '@/types/blog';
+import { SeriesNavigation } from '@/components/SeriesNavigation';
+import { TableOfContents } from '@/components/TableOfContents';
+import type {
+  BlogPost as BlogPostType,
+  SeriesNavigation as SeriesNavigationType,
+  TocEntry,
+} from '@/types/blog';
 import { MDXRenderer } from '@/components/MDXRenderer';
 
 export default function BlogPost() {
@@ -35,6 +45,9 @@ export default function BlogPost() {
     previous: BlogPostType | null;
     next: BlogPostType | null;
   }>({ previous: null, next: null });
+  const [seriesNavigation, setSeriesNavigation] =
+    useState<SeriesNavigationType | null>(null);
+  const [tableOfContents, setTableOfContents] = useState<TocEntry[]>([]);
 
   useEffect(() => {
     async function fetchPost() {
@@ -58,7 +71,17 @@ export default function BlogPost() {
 
         setPost(currentPost);
 
-        // Get all posts for navigation
+        // Extract table of contents
+        const toc = extractTableOfContents(currentPost.content);
+        setTableOfContents(toc);
+
+        // Get series navigation if post is part of a series
+        if (currentPost.series) {
+          const seriesNav = await getSeriesNavigation(currentPost);
+          setSeriesNavigation(seriesNav);
+        }
+
+        // Get all posts for general navigation
         const allPosts = await loadBlogPosts();
         const currentIndex = allPosts.findIndex((p) => p.slug === slug);
 
@@ -175,12 +198,39 @@ export default function BlogPost() {
             </p>
           </header>
 
-          <Separator className="mb-8" />
+          {/* Series navigation */}
+          {post.series && seriesNavigation && (
+            <>
+              <SeriesNavigation
+                post={post}
+                navigation={seriesNavigation}
+                className="mb-8"
+              />
+              <Separator className="mb-8" />
+            </>
+          )}
 
-          {/* Post content */}
-          <article className="prose prose-lg dark:prose-invert max-w-none">
-            <MDXRenderer content={post.content} />
-          </article>
+          {/* Main content area with sidebar */}
+          <div className="grid gap-8 lg:grid-cols-4">
+            {/* Main content */}
+            <div className="lg:col-span-3">
+              <article className="prose prose-lg dark:prose-invert max-w-none">
+                <MDXRenderer content={post.content} />
+              </article>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8 space-y-6">
+                {/* Table of contents */}
+                {tableOfContents.length > 0 && (
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <TableOfContents entries={tableOfContents} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
           <Separator className="my-12" />
 

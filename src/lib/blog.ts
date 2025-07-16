@@ -8,6 +8,8 @@ export const BlogPostFrontmatterSchema = z.object({
   updatedDate: z.string().optional(),
   tags: z.array(z.string()).default([]),
   category: z.string().default('general'),
+  series: z.string().optional(),
+  seriesOrder: z.number().optional(),
   featuredImage: z.string().optional(),
   published: z.boolean().default(true),
 });
@@ -25,6 +27,8 @@ export interface BlogPost {
   updatedDate?: Date;
   tags: string[];
   category: string;
+  series?: string;
+  seriesOrder?: number;
   featuredImage?: string;
   published: boolean;
 }
@@ -51,6 +55,42 @@ export function createSlug(title: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
+}
+
+// Series information interface
+export interface SeriesInfo {
+  name: string;
+  description: string;
+  posts: BlogPost[];
+  totalPosts: number;
+}
+
+// Table of contents entry interface
+export interface TocEntry {
+  id: string;
+  title: string;
+  level: number;
+}
+
+// Utility to extract table of contents from content
+export function extractTableOfContents(content: string): TocEntry[] {
+  const headingRegex = /^(#{1,6})\s+(.+)$/gm;
+  const toc: TocEntry[] = [];
+  let match;
+
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length;
+    const title = match[2].trim();
+    const id = createSlug(title);
+
+    toc.push({
+      id,
+      title,
+      level,
+    });
+  }
+
+  return toc;
 }
 
 // Utility to parse frontmatter from MDX content
@@ -96,6 +136,10 @@ export function parseFrontmatter(content: string): {
           } else {
             frontmatterObj[key] = [];
           }
+        }
+        // Parse numbers
+        else if (/^\d+$/.test(value)) {
+          frontmatterObj[key] = parseInt(value, 10);
         }
         // Parse booleans
         else if (value === 'true' || value === 'false') {

@@ -2,9 +2,9 @@
 
 ## Overview
 
-This design document outlines the architecture and implementation approach for Thomas Rohde's personal landing page. The application will be built as a modern single-page application (SPA) using React 18+ with Vite as the build tool, Tailwind CSS for styling, shadcn/ui for component library, and MDX for blog content management. The site will be deployed on GitHub Pages with automated CI/CD.
+This design document outlines the architecture and implementation approach for Thomas Klok Rohde's personal landing page. The application will be built as a modern single-page application (SPA) using React 18+ with Vite as the build tool, Tailwind CSS for styling, shadcn/ui for component library, and MDX for blog content management. The site will be deployed on GitHub Pages with automated CI/CD.
 
-The landing page serves dual purposes: a professional portfolio showcasing Thomas Rohde's background and expertise, and a blog platform for sharing technical content and thoughts. The design emphasizes performance, accessibility, and maintainability while providing an excellent user experience across all devices.
+The landing page serves dual purposes: a professional portfolio showcasing Thomas Klok Rohde's background and expertise, and a blog platform for sharing technical content and thoughts. The design emphasizes performance, accessibility, and maintainability while providing an excellent user experience across all devices.
 
 ## Architecture
 

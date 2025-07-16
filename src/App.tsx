@@ -10,6 +10,7 @@ import { DevToolsToggle } from '@/components/DevTools';
 const Home = lazy(() => import('@/pages/Home'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
+const Series = lazy(() => import('@/pages/Series'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 function App() {
@@ -40,6 +41,14 @@ function App() {
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <BlogPost />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="series/:seriesName"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Series />
                   </Suspense>
                 }
               />

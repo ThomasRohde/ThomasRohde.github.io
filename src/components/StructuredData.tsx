@@ -1,164 +1,35 @@
 import { useEffect } from 'react';
 import type { BlogPost } from '@/types/blog';
+import { seoConfig } from '@/lib/seo';
 
-interface StructuredDataProps {
-  type: 'website' | 'article' | 'person' | 'breadcrumb';
-  data: WebsiteData | ArticleData | PersonData | BreadcrumbData;
+export interface StructuredDataProps {
+  type: 'article' | 'breadcrumb' | 'person' | 'website';
+  data: Record<string, unknown>;
 }
 
-interface WebsiteData {
-  name: string;
-  description: string;
-  url: string;
-  author: PersonData;
-}
-
-interface ArticleData {
-  headline: string;
-  description: string;
-  image?: string;
-  datePublished: string;
-  dateModified?: string;
-  author: PersonData;
-  publisher: PersonData;
-  url: string;
-  keywords?: string[];
-  articleSection?: string;
-  wordCount?: number;
-}
-
-interface PersonData {
-  name: string;
-  url?: string;
-  sameAs?: string[];
-  jobTitle?: string;
-  description?: string;
-}
-
-interface BreadcrumbData {
-  items: Array<{
-    name: string;
-    url: string;
-  }>;
-}
-
+/**
+ * Component to inject structured data (JSON-LD) into the page head
+ */
 export function StructuredData({ type, data }: StructuredDataProps) {
   useEffect(() => {
-    let structuredData: Record<string, unknown> = {
-      '@context': 'https://schema.org',
-    };
+    const scriptId = `structured-data-${type}`;
 
-    switch (type) {
-      case 'website': {
-        const websiteData = data as WebsiteData;
-        structuredData = {
-          ...structuredData,
-          '@type': 'WebSite',
-          name: websiteData.name,
-          description: websiteData.description,
-          url: websiteData.url,
-          author: {
-            '@type': 'Person',
-            name: websiteData.author.name,
-            url: websiteData.author.url,
-            sameAs: websiteData.author.sameAs,
-            jobTitle: websiteData.author.jobTitle,
-          },
-          potentialAction: {
-            '@type': 'SearchAction',
-            target: {
-              '@type': 'EntryPoint',
-              urlTemplate: `${websiteData.url}/blog?q={search_term_string}`,
-            },
-            'query-input': 'required name=search_term_string',
-          },
-        };
-        break;
-      }
-
-      case 'article': {
-        const articleData = data as ArticleData;
-        structuredData = {
-          ...structuredData,
-          '@type': 'BlogPosting',
-          headline: articleData.headline,
-          description: articleData.description,
-          image: articleData.image,
-          datePublished: articleData.datePublished,
-          dateModified: articleData.dateModified || articleData.datePublished,
-          author: {
-            '@type': 'Person',
-            name: articleData.author.name,
-            url: articleData.author.url,
-            sameAs: articleData.author.sameAs,
-          },
-          publisher: {
-            '@type': 'Person',
-            name: articleData.publisher.name,
-            url: articleData.publisher.url,
-          },
-          url: articleData.url,
-          mainEntityOfPage: {
-            '@type': 'WebPage',
-            '@id': articleData.url,
-          },
-          keywords: articleData.keywords,
-          articleSection: articleData.articleSection,
-          wordCount: articleData.wordCount,
-        };
-        break;
-      }
-
-      case 'person': {
-        const personData = data as PersonData;
-        structuredData = {
-          ...structuredData,
-          '@type': 'Person',
-          name: personData.name,
-          url: personData.url,
-          sameAs: personData.sameAs,
-          jobTitle: personData.jobTitle,
-          description: personData.description,
-        };
-        break;
-      }
-
-      case 'breadcrumb': {
-        const breadcrumbData = data as BreadcrumbData;
-        structuredData = {
-          ...structuredData,
-          '@type': 'BreadcrumbList',
-          itemListElement: breadcrumbData.items.map((item, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            name: item.name,
-            item: item.url,
-          })),
-        };
-        break;
-      }
-    }
-
-    // Remove existing structured data script with the same type
-    const existingScript = document.querySelector(
-      `script[data-structured-data="${type}"]`
-    );
+    // Remove existing structured data of this type
+    const existingScript = document.getElementById(scriptId);
     if (existingScript) {
       existingScript.remove();
     }
 
     // Create and append new structured data script
     const script = document.createElement('script');
+    script.id = scriptId;
     script.type = 'application/ld+json';
-    script.setAttribute('data-structured-data', type);
-    script.textContent = JSON.stringify(structuredData, null, 2);
+    script.textContent = JSON.stringify(data, null, 2);
     document.head.appendChild(script);
 
     // Cleanup function
     return () => {
-      const scriptToRemove = document.querySelector(
-        `script[data-structured-data="${type}"]`
-      );
+      const scriptToRemove = document.getElementById(scriptId);
       if (scriptToRemove) {
         scriptToRemove.remove();
       }
@@ -168,86 +39,160 @@ export function StructuredData({ type, data }: StructuredDataProps) {
   return null;
 }
 
-// Helper function to create structured data for blog posts
-export function createBlogPostStructuredData(
-  post: BlogPost,
-  baseUrl: string = 'https://thomasrohde.github.io'
-): ArticleData {
-  const author: PersonData = {
-    name: 'Thomas Rohde',
-    url: baseUrl,
-    sameAs: [
-      'https://github.com/thomasrohde',
-      'https://linkedin.com/in/throhde',
-      'https://twitter.com/trohde',
-    ],
-    jobTitle: 'Full Stack Developer',
-    description:
-      'Passionate full stack developer sharing insights on modern web development',
-  };
-
+/**
+ * Create structured data for blog post
+ */
+export function createBlogPostStructuredData(post: BlogPost) {
   return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt,
     image: post.featuredImage
-      ? `${baseUrl}${post.featuredImage}`
-      : `${baseUrl}/images/og-image.jpg`,
+      ? `${seoConfig.siteUrl}${post.featuredImage}`
+      : `${seoConfig.siteUrl}${seoConfig.defaultImage}`,
+    url: `${seoConfig.siteUrl}/blog/${post.slug}`,
     datePublished: post.publishedDate.toISOString(),
-    dateModified: post.updatedDate?.toISOString(),
-    author,
-    publisher: author,
-    url: `${baseUrl}/blog/${post.slug}`,
-    keywords: post.tags,
+    dateModified: (post.updatedDate || post.publishedDate).toISOString(),
+    author: {
+      '@type': 'Person',
+      name: seoConfig.author.name,
+      url: seoConfig.siteUrl,
+      sameAs: [seoConfig.author.github, seoConfig.author.linkedin].filter(
+        Boolean
+      ),
+    },
+    publisher: {
+      '@type': 'Person',
+      name: seoConfig.author.name,
+      url: seoConfig.siteUrl,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${seoConfig.siteUrl}/blog/${post.slug}`,
+    },
+    keywords: post.tags.join(', '),
     articleSection: post.category,
-    wordCount: Math.ceil(post.content.length / 5), // Rough estimate: 5 characters per word
+    wordCount: post.content
+      ? post.content.trim().split(/\s+/).length
+      : undefined,
+    timeRequired: `PT${post.readTime}M`,
+    ...(post.series && {
+      isPartOf: {
+        '@type': 'BlogPosting',
+        name: post.series,
+        url: `${seoConfig.siteUrl}/blog?series=${encodeURIComponent(post.series)}`,
+      },
+      position: post.seriesOrder,
+    }),
   };
 }
 
-// Helper function to create website structured data
-export function createWebsiteStructuredData(
-  baseUrl: string = 'https://thomasrohde.github.io'
-): WebsiteData {
+/**
+ * Create breadcrumb structured data
+ */
+export function createBreadcrumbStructuredData(
+  breadcrumbs: Array<{ name: string; url: string }>
+) {
   return {
-    name: 'Thomas Rohde - Full Stack Developer',
-    description:
-      'Personal portfolio and blog of Thomas Rohde, a passionate full stack developer sharing insights on modern web development, React, TypeScript, and more.',
-    url: baseUrl,
-    author: {
-      name: 'Thomas Rohde',
-      url: baseUrl,
-      sameAs: [
-        'https://github.com/thomasrohde',
-        'https://linkedin.com/in/thomasrohde',
-        'https://twitter.com/thomasrohde',
-      ],
-      jobTitle: 'Full Stack Developer',
-      description:
-        'Passionate full stack developer sharing insights on modern web development',
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbs.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      item: crumb.url,
+    })),
+  };
+}
+
+/**
+ * Create person structured data
+ */
+export function createPersonStructuredData() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: seoConfig.author.name,
+    url: seoConfig.siteUrl,
+    image: `${seoConfig.siteUrl}/images/profile-photo.jpg`,
+    description: seoConfig.defaultDescription,
+    jobTitle: 'Full Stack Developer',
+    knowsAbout: [
+      'Web Development',
+      'React',
+      'TypeScript',
+      'JavaScript',
+      'Node.js',
+      'Frontend Development',
+      'Backend Development',
+      'Software Architecture',
+      'AI-Assisted Development',
+      'Spec-Driven Development',
+    ],
+    sameAs: [seoConfig.author.github, seoConfig.author.linkedin].filter(
+      Boolean
+    ),
+    alumniOf: {
+      '@type': 'Organization',
+      name: 'Technical University',
+    },
+    worksFor: {
+      '@type': 'Organization',
+      name: 'Freelance',
     },
   };
 }
 
-// Helper function to create person structured data
-export function createPersonStructuredData(
-  baseUrl: string = 'https://thomasrohde.github.io'
-): PersonData {
+/**
+ * Create website structured data
+ */
+export function createWebsiteStructuredData() {
   return {
-    name: 'Thomas Rohde',
-    url: baseUrl,
-    sameAs: [
-      'https://github.com/thomasrohde',
-      'https://linkedin.com/in/thomasrohde',
-      'https://twitter.com/thomasrohde',
-    ],
-    jobTitle: 'Full Stack Developer',
-    description:
-      'Passionate full stack developer sharing insights on modern web development, React, TypeScript, and more.',
+    '@context': 'https://schema.org',
+    '@type': 'Website',
+    name: seoConfig.siteName,
+    url: seoConfig.siteUrl,
+    description: seoConfig.defaultDescription,
+    author: {
+      '@type': 'Person',
+      name: seoConfig.author.name,
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${seoConfig.siteUrl}/blog?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
   };
 }
 
-// Helper function to create breadcrumb structured data
-export function createBreadcrumbStructuredData(
-  items: Array<{ name: string; url: string }>
-): BreadcrumbData {
-  return { items };
+/**
+ * Create blog series structured data
+ */
+export function createBlogSeriesStructuredData(
+  seriesName: string,
+  posts: BlogPost[]
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    name: seriesName,
+    description: `A comprehensive series about ${seriesName.replace(/-/g, ' ')}`,
+    url: `${seoConfig.siteUrl}/blog?series=${encodeURIComponent(seriesName)}`,
+    hasPart: posts.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      url: `${seoConfig.siteUrl}/blog/${post.slug}`,
+      datePublished: post.publishedDate.toISOString(),
+      position: post.seriesOrder,
+    })),
+    author: {
+      '@type': 'Person',
+      name: seoConfig.author.name,
+      url: seoConfig.siteUrl,
+    },
+  };
 }

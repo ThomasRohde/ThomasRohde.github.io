@@ -1,9 +1,10 @@
-import type { BlogPost } from '@/types/blog';
+import { loadBlogPosts } from '@/lib/blogService';
+import { seoConfig } from '@/lib/seo';
 
-export interface SitemapUrl {
-  loc: string;
-  lastmod?: string;
-  changefreq?:
+export interface SitemapEntry {
+  url: string;
+  lastModified: string;
+  changeFrequency:
     | 'always'
     | 'hourly'
     | 'daily'
@@ -11,125 +12,100 @@ export interface SitemapUrl {
     | 'monthly'
     | 'yearly'
     | 'never';
-  priority?: number;
+  priority: number;
 }
 
 /**
- * Generate sitemap URLs for the website
+ * Generate sitemap entries for all pages
  */
-export function generateSitemapUrls(
-  blogPosts: BlogPost[],
-  baseUrl: string = 'https://thomasrohde.github.io'
-): SitemapUrl[] {
-  const urls: SitemapUrl[] = [];
+export async function generateSitemapEntries(): Promise<SitemapEntry[]> {
+  const entries: SitemapEntry[] = [];
 
-  // Homepage
-  urls.push({
-    loc: baseUrl,
-    lastmod: new Date().toISOString().split('T')[0],
-    changefreq: 'weekly',
-    priority: 1.0,
-  });
+  // Static pages
+  const staticPages = [
+    { url: '/', priority: 1.0, changeFreq: 'weekly' as const },
+    { url: '/blog', priority: 0.8, changeFreq: 'daily' as const },
+  ];
 
-  // Blog index page
-  urls.push({
-    loc: `${baseUrl}/blog`,
-    lastmod:
-      blogPosts.length > 0
-        ? blogPosts[0].publishedDate.toISOString().split('T')[0]
-        : new Date().toISOString().split('T')[0],
-    changefreq: 'weekly',
-    priority: 0.8,
-  });
-
-  // Individual blog posts
-  blogPosts.forEach((post) => {
-    urls.push({
-      loc: `${baseUrl}/blog/${post.slug}`,
-      lastmod: (post.updatedDate || post.publishedDate)
-        .toISOString()
-        .split('T')[0],
-      changefreq: 'monthly',
-      priority: 0.6,
+  staticPages.forEach((page) => {
+    entries.push({
+      url: `${seoConfig.siteUrl}${page.url}`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: page.changeFreq,
+      priority: page.priority,
     });
   });
 
-  return urls;
+  // Blog posts
+  try {
+    const posts = await loadBlogPosts();
+    posts.forEach((post) => {
+      entries.push({
+        url: `${seoConfig.siteUrl}/blog/${post.slug}`,
+        lastModified: (post.updatedDate || post.publishedDate).toISOString(),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
+    });
+  } catch (error) {
+    console.error('Error loading blog posts for sitemap:', error);
+  }
+
+  return entries;
 }
 
 /**
  * Generate XML sitemap content
  */
-export function generateSitemapXml(urls: SitemapUrl[]): string {
-  const urlElements = urls
-    .map((url) => {
-      let urlXml = `  <url>\n    <loc>${url.loc}</loc>`;
+export async function generateSitemapXML(): Promise<string> {
+  const entries = await generateSitemapEntries();
 
-      if (url.lastmod) {
-        urlXml += `\n    <lastmod>${url.lastmod}</lastmod>`;
-      }
-
-      if (url.changefreq) {
-        urlXml += `\n    <changefreq>${url.changefreq}</changefreq>`;
-      }
-
-      if (url.priority !== undefined) {
-        urlXml += `\n    <priority>${url.priority}</priority>`;
-      }
-
-      urlXml += '\n  </url>';
-      return urlXml;
-    })
-    .join('\n');
+  const xmlEntries = entries
+    .map(
+      (entry) => `
+  <url>
+    <loc>${entry.url}</loc>
+    <lastmod>${entry.lastModified}</lastmod>
+    <changefreq>${entry.changeFrequency}</changefreq>
+    <priority>${entry.priority}</priority>
+  </url>`
+    )
+    .join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urlElements}
+${xmlEntries}
 </urlset>`;
 }
 
 /**
- * Generate RSS feed for blog posts
+ * Generate robots.txt content
  */
-export function generateRssFeed(
-  blogPosts: BlogPost[],
-  baseUrl: string = 'https://thomasrohde.github.io'
-): string {
-  const items = blogPosts
-    .slice(0, 20)
-    .map((post) => {
-      const pubDate = post.publishedDate.toUTCString();
-      const link = `${baseUrl}/blog/${post.slug}`;
+export function generateRobotsTxt(): string {
+  return `User-agent: *
+Allow: /
 
-      return `    <item>
-      <title><![CDATA[${post.title}]]></title>
-      <description><![CDATA[${post.excerpt}]]></description>
-      <link>${link}</link>
-      <guid isPermaLink="true">${link}</guid>
-      <pubDate>${pubDate}</pubDate>
-      <category><![CDATA[${post.category}]]></category>
-      ${post.tags.map((tag) => `<category><![CDATA[${tag}]]></category>`).join('\n      ')}
-    </item>`;
-    })
-    .join('\n');
+# Sitemap
+Sitemap: ${seoConfig.siteUrl}/sitemap.xml
 
-  const lastBuildDate =
-    blogPosts.length > 0
-      ? blogPosts[0].publishedDate.toUTCString()
-      : new Date().toUTCString();
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Thomas Rohde - Blog</title>
-    <description>Thoughts, tutorials, and insights on web development and technology</description>
-    <link>${baseUrl}/blog</link>
-    <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml"/>
-    <language>en-us</language>
-    <lastBuildDate>${lastBuildDate}</lastBuildDate>
-    <managingEditor>thomas@thomasrohde.com (Thomas Rohde)</managingEditor>
-    <webMaster>thomas@thomasrohde.com (Thomas Rohde)</webMaster>
-${items}
-  </channel>
-</rss>`;
+# Block access to development files
+Disallow: /src/
+Disallow: /.git/
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /.env*
+
+# Allow access to important files
+Allow: /robots.txt
+Allow: /sitemap.xml
+Allow: /favicon.ico
+Allow: /*.css
+Allow: /*.js
+Allow: /*.jpg
+Allow: /*.png
+Allow: /*.svg
+Allow: /*.webp`;
 }

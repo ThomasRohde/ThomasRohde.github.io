@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Tag } from 'lucide-react';
+import { Calendar, Clock, Tag, BookOpen } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/blog';
@@ -15,7 +15,7 @@ export function BlogCard({ post, className }: BlogCardProps) {
       )}
     >
       <CardHeader className="pb-4">
-        <div className="text-muted-foreground mb-3 flex items-center gap-4 text-sm">
+        <div className="text-muted-foreground mb-3 flex flex-wrap items-center gap-4 text-sm">
           <div className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             <time dateTime={post.publishedDate.toISOString()}>
@@ -26,6 +26,21 @@ export function BlogCard({ post, className }: BlogCardProps) {
             <Clock className="h-4 w-4" />
             <span>{post.readTime} min read</span>
           </div>
+          {post.series && (
+            <div className="flex items-center gap-1">
+              <BookOpen className="h-4 w-4" />
+              <Link
+                to={`/series/${post.series}`}
+                className="hover:text-foreground transition-colors"
+              >
+                {post.series
+                  .split('-')
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')}
+                {post.seriesOrder && ` (Part ${post.seriesOrder})`}
+              </Link>
+            </div>
+          )}
         </div>
 
         <Link

@@ -4,8 +4,26 @@ Allow: /
 # Sitemap
 Sitemap: https://thomasrohde.github.io/sitemap.xml
 
-# Disallow crawling of development files
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Block access to development files
 Disallow: /src/
+Disallow: /.git/
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /.env*
 Disallow: /*.json
 Disallow: /*.config.js
 Disallow: /*.config.ts
+
+# Allow access to important files
+Allow: /robots.txt
+Allow: /sitemap.xml
+Allow: /favicon.ico
+Allow: /*.css
+Allow: /*.js
+Allow: /*.jpg
+Allow: /*.png
+Allow: /*.svg
+Allow: /*.webp

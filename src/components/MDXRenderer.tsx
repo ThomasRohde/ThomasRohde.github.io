@@ -5,9 +5,56 @@ import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import rehypePrettyCode from 'rehype-pretty-code';
+import { createSlug } from '@/lib/blog';
 
 interface MDXRendererProps {
   content: string;
+}
+
+interface HastNode {
+  type: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+  value?: string;
+}
+
+// Custom rehype plugin to add IDs to headings
+function rehypeAddHeadingIds() {
+  return (tree: HastNode) => {
+    const visit = (node: HastNode) => {
+      if (
+        node.type === 'element' &&
+        node.tagName &&
+        /^h[1-6]$/.test(node.tagName)
+      ) {
+        const textContent = extractTextContent(node);
+        if (textContent) {
+          node.properties = node.properties || {};
+          node.properties.id = createSlug(textContent);
+        }
+      }
+
+      if (node.children) {
+        node.children.forEach(visit);
+      }
+    };
+
+    visit(tree);
+  };
+}
+
+// Helper function to extract text content from a node
+function extractTextContent(node: HastNode): string {
+  if (node.type === 'text' && node.value) {
+    return node.value;
+  }
+
+  if (node.children) {
+    return node.children.map(extractTextContent).join('');
+  }
+
+  return '';
 }
 
 export function MDXRenderer({ content }: MDXRendererProps) {
@@ -25,6 +72,7 @@ export function MDXRenderer({ content }: MDXRendererProps) {
           .use(remarkParse)
           .use(remarkGfm)
           .use(remarkRehype, { allowDangerousHtml: true })
+          .use(rehypeAddHeadingIds)
           .use(rehypePrettyCode, {
             theme: 'github-dark',
             keepBackground: false,

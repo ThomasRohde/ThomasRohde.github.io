@@ -16,7 +16,7 @@ export interface SEOConfig {
 }
 
 export const seoConfig: SEOConfig = {
-  siteName: 'Thomas Rohde',
+  siteName: 'Thomas Klok Rohde',
   siteUrl: 'https://thomasrohde.github.io',
   author: {
     name: 'Thomas Klok Rohde',
@@ -25,9 +25,9 @@ export const seoConfig: SEOConfig = {
     github: 'https://github.com/thomasrohde',
     linkedin: 'https://linkedin.com/in/throhde',
   },
-  defaultImage: '/images/og-image.jpg',
+  defaultImage: '/images/blog-hero.jpg',
   defaultDescription:
-    'Personal portfolio and blog of Thomas Rohde, a passionate full stack developer sharing insights on modern web development, React, TypeScript, and more.',
+    'Personal portfolio and blog of Thomas Klok Rohde, a passionate full stack developer sharing insights on modern web development, React, TypeScript, and more.',
   defaultKeywords: ['Thomas Klok Rohde', 'Enterprise Architect'],
 };
 
@@ -71,6 +71,13 @@ export function generateBlogPostSEO(post: BlogPost) {
     updatedDate: post.updatedDate?.toISOString(),
     tags: post.tags,
     category: post.category,
+    series: post.series,
+    seriesOrder: post.seriesOrder,
+    readTime: post.readTime,
+    wordCount: post.content
+      ? post.content.trim().split(/\s+/).length
+      : undefined,
+    author: seoConfig.author.name,
   };
 }
 

@@ -27,7 +27,7 @@ export default function Hero() {
       <div className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-7xl">
-            Thomas Rohde
+            Thomas Klok Rohde
           </h1>
           <p
             className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl md:text-2xl"
@@ -53,7 +53,8 @@ export default function Hero() {
               Learn More
             </Button>
             <span id="about-description" className="sr-only">
-              Navigate to the about section to learn more about Thomas Rohde
+              Navigate to the about section to learn more about Thomas Klok
+              Rohde
             </span>
           </div>
         </div>

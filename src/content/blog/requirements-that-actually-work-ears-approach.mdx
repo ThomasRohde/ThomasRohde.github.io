@@ -1,0 +1,299 @@
+---
+title: 'Requirements That Actually Work: The EARS Approach in Practice'
+excerpt: 'Learn how to transform vague project ideas into crystal-clear, testable requirements using the EARS format and user story methodology, with real examples from building a personal landing page.'
+publishedDate: '2025-01-15'
+tags:
+  [
+    'kiro',
+    'spec-driven-development',
+    'requirements',
+    'ears-format',
+    'user-stories',
+    'methodology',
+  ]
+category: 'methodology'
+series: 'kiro-spec-driven-development'
+seriesOrder: 2
+featuredImage: '/images/kiro-series/requirements.jpg'
+published: true
+---
+
+# Requirements That Actually Work: The EARS Approach in Practice
+
+"I need a personal website."
+
+That's how most projects start—with a vague idea that feels clear in your head but becomes murky the moment you try to explain it to someone else (or to an AI assistant). The gap between "I know what I want" and "I can clearly communicate what I want" is where most software projects go to die.
+
+In the previous post, we explored how spec-driven development transforms chaotic "vibe coding" into structured, AI-assisted development. Today, we're diving deep into the foundation of that methodology: **requirements that actually work**.
+
+## The Problem with Traditional Requirements
+
+Before we jump into solutions, let's acknowledge the elephant in the room. Most developers hate writing requirements. They're seen as bureaucratic overhead, something that slows down the "real work" of coding.
+
+This hatred is justified when requirements look like this:
+
+> "The system should be user-friendly and performant. It should handle user authentication and display content in an attractive way. The interface should be responsive and work on all devices."
+
+These aren't requirements—they're wishes. They're vague, untestable, and provide zero guidance for implementation. No wonder developers skip them and jump straight to code.
+
+But what if requirements could be different? What if they could be precise, testable, and actually helpful for both human developers and AI assistants?
+
+## Enter EARS: Easy Approach to Requirements Syntax
+
+EARS (Easy Approach to Requirements Syntax) is a structured format that transforms vague wishes into precise, testable specifications. Instead of saying "the system should be user-friendly," EARS forces you to be specific:
+
+**WHEN** a user accesses the homepage **THEN** the system **SHALL** display a hero section with name, title, and brief introduction.
+
+The magic is in the structure:
+
+- **WHEN** defines the trigger or condition
+- **THEN** specifies the system response
+- **SHALL** indicates a mandatory requirement
+
+This format eliminates ambiguity and creates requirements that can be tested, implemented, and verified.
+
+## From Rough Idea to Structured Requirements: A Real Example
+
+Let me show you how this works in practice using the personal landing page project. We started with that same vague idea: "I need a personal website."
+
+### Step 1: The Initial Brain Dump
+
+First, I captured everything I thought I wanted:
+
+- A homepage with my information
+- A blog for writing posts
+- Good SEO so people can find it
+- Mobile-friendly design
+- Easy to deploy and maintain
+- Professional looking
+
+Sound familiar? This is the typical starting point—a collection of vague desires that could mean anything.
+
+### Step 2: User Story Framework
+
+Next, I applied the user story framework to add structure and perspective:
+
+**As a [role], I want [feature], so that [benefit]**
+
+This simple template forces you to think about:
+
+- **Who** is using this feature?
+- **What** do they want to accomplish?
+- **Why** does it matter to them?
+
+Here's how our vague "homepage with my information" became structured:
+
+**User Story:** As a visitor, I want to see a professional landing page with clear information about Thomas Klok Rohde, so that I can understand his background and expertise.
+
+Suddenly, we have clarity about the user (visitor), the feature (professional landing page), and the value (understanding background and expertise).
+
+### Step 3: EARS Acceptance Criteria
+
+Now comes the real magic. Each user story gets broken down into specific, testable acceptance criteria using the EARS format:
+
+```markdown
+#### Acceptance Criteria
+
+1. WHEN a visitor accesses the homepage THEN the system SHALL display a hero section with name, title, and brief introduction
+2. WHEN a visitor scrolls through the page THEN the system SHALL show sections for About, Skills, Experience, and Contact information
+3. WHEN the page loads THEN the system SHALL use a responsive layout that works on desktop, tablet, and mobile devices
+4. WHEN content is displayed THEN the system SHALL use shadcn/ui components for consistent styling
+5. WHEN navigation is needed THEN the system SHALL provide a clean navigation menu to different sections
+```
+
+Notice how each criterion is:
+
+- **Specific**: Exactly what should happen
+- **Testable**: You can verify if it works or not
+- **Actionable**: Clear enough for implementation
+
+## The Iterative Refinement Process
+
+Here's where spec-driven development really shines. Requirements aren't written in stone—they evolve through feedback and refinement.
+
+### Initial Draft Problems
+
+My first attempt at the blog requirements looked like this:
+
+> "The system should support blog posts with good formatting and syntax highlighting."
+
+Classic vague requirement. Through the iterative process, this became:
+
+```markdown
+**User Story:** As a content creator, I want to write and publish blog posts using Markdown, so that I can share thoughts and technical content easily.
+
+#### Acceptance Criteria
+
+1. WHEN blog posts are created THEN the system SHALL support MDX format with frontmatter metadata
+2. WHEN the blog index is accessed THEN the system SHALL display a list of all published posts with titles, dates, and excerpts
+3. WHEN a blog post is viewed THEN the system SHALL render MDX content with syntax highlighting for code blocks
+4. WHEN blog content includes code THEN the system SHALL use rehype-pretty-code for enhanced syntax highlighting
+5. WHEN blog posts are organized THEN the system SHALL support GitHub Flavored Markdown features
+```
+
+### The Feedback Loop
+
+The refinement happened through asking specific questions:
+
+- What format should blog posts use? (Answer: MDX for flexibility)
+- How should code be highlighted? (Answer: rehype-pretty-code for quality)
+- What metadata is needed? (Answer: frontmatter for titles, dates, tags)
+- How should posts be organized? (Answer: GitHub Flavored Markdown support)
+
+Each question led to more specific requirements, and each requirement could be tested and implemented.
+
+## Real Requirements from the Personal Landing Page Project
+
+Let me show you how this methodology produced concrete, actionable requirements. Here's the complete breakdown for one of the more complex requirements:
+
+### Requirement 3: Blog System with MDX
+
+**User Story:** As a content creator, I want to write and publish blog posts using Markdown, so that I can share thoughts and technical content easily.
+
+#### Acceptance Criteria
+
+1. **WHEN** blog posts are created **THEN** the system **SHALL** support MDX format with frontmatter metadata
+2. **WHEN** the blog index is accessed **THEN** the system **SHALL** display a list of all published posts with titles, dates, and excerpts
+3. **WHEN** a blog post is viewed **THEN** the system **SHALL** render MDX content with syntax highlighting for code blocks
+4. **WHEN** blog content includes code **THEN** the system **SHALL** use rehype-pretty-code for enhanced syntax highlighting
+5. **WHEN** blog posts are organized **THEN** the system **SHALL** support GitHub Flavored Markdown features
+
+This single requirement gave me everything I needed to:
+
+- Choose the right technology (MDX)
+- Understand the user experience (blog index, individual posts)
+- Set quality standards (syntax highlighting with rehype-pretty-code)
+- Define content structure (frontmatter metadata)
+
+## How Proper Requirements Prevent Scope Creep
+
+Here's a real example of how structured requirements saved the project from scope creep.
+
+Midway through development, I had the idea to add a comment system to blog posts. In traditional development, I might have just started implementing it. But with spec-driven development, I had to ask: **Does this fulfill any existing requirement?**
+
+Looking at the requirements, the answer was no. The user story was about content creation and sharing, not community interaction. Adding comments would be scope creep—a new feature that wasn't part of the original vision.
+
+This doesn't mean comments are bad, but it means they should be:
+
+1. Properly specified with their own user story and acceptance criteria
+2. Prioritized against other features
+3. Implemented as a conscious decision, not an impulse
+
+## Requirements as AI Assistant Context
+
+Here's where requirements become truly powerful in the age of AI-assisted development. Instead of starting each conversation with your AI assistant from scratch, you can provide rich context through your requirements.
+
+**Bad AI prompt:**
+
+> "Create a blog system for my website"
+
+**Good AI prompt:**
+
+> "Based on Requirement 3 in the attached requirements document, implement the MDX blog system. The user story is: 'As a content creator, I want to write and publish blog posts using Markdown, so that I can share thoughts and technical content easily.' The acceptance criteria specify MDX format with frontmatter, blog index with post listings, individual post rendering with syntax highlighting using rehype-pretty-code, and GitHub Flavored Markdown support."
+
+The second prompt gives the AI assistant:
+
+- Clear context about what you're building
+- Specific technical requirements (MDX, rehype-pretty-code)
+- User perspective (content creator)
+- Success criteria (what "done" looks like)
+
+## Code Examples: Well-Structured Requirements
+
+Let me show you the difference between poorly structured and well-structured requirements using actual examples from the project.
+
+### Poor Structure (Before)
+
+```markdown
+## Website Requirements
+
+- Homepage with personal info
+- Blog functionality
+- Mobile responsive
+- SEO optimized
+- Easy deployment
+```
+
+### Good Structure (After)
+
+```markdown
+### Requirement 2: Landing Page Content and Layout
+
+**User Story:** As a visitor, I want to see a professional landing page with clear information about Thomas Klok Rohde, so that I can understand his background and expertise.
+
+#### Acceptance Criteria
+
+1. WHEN a visitor accesses the homepage THEN the system SHALL display a hero section with name, title, and brief introduction
+2. WHEN a visitor scrolls through the page THEN the system SHALL show sections for About, Skills, Experience, and Contact information
+3. WHEN the page loads THEN the system SHALL use a responsive layout that works on desktop, tablet, and mobile devices
+4. WHEN content is displayed THEN the system SHALL use shadcn/ui components for consistent styling
+5. WHEN navigation is needed THEN the system SHALL provide a clean navigation menu to different sections
+```
+
+The difference is night and day. The second version provides:
+
+- Clear user perspective
+- Specific, testable criteria
+- Technical guidance (shadcn/ui components)
+- Comprehensive coverage of the feature
+
+## The Compound Benefits
+
+As we built out the complete requirements document, something interesting happened. The requirements started reinforcing each other and revealing gaps we hadn't considered.
+
+For example, Requirement 5 (GitHub Pages Deployment) forced us to think about build optimization and base path configuration. This led to additional acceptance criteria in Requirement 6 (Performance and SEO) about bundle optimization and proper meta tags.
+
+The requirements became a system—each part supporting and informing the others.
+
+## Common Pitfalls and How to Avoid Them
+
+### Pitfall 1: Too Much Detail Too Early
+
+**Problem:** Trying to specify every implementation detail in requirements
+**Solution:** Focus on what and why, not how. Save implementation details for the design phase.
+
+### Pitfall 2: Untestable Requirements
+
+**Problem:** Requirements like "the system should be fast"
+**Solution:** Use EARS format to make requirements specific and measurable
+
+### Pitfall 3: Missing the User Perspective
+
+**Problem:** Requirements written from a technical perspective only
+**Solution:** Always start with user stories to maintain focus on value
+
+### Pitfall 4: Requirements That Never Change
+
+**Problem:** Treating requirements as immutable once written
+**Solution:** Embrace iterative refinement based on feedback and learning
+
+## What's Next: From Requirements to Design
+
+With solid requirements in place, we have a foundation for everything that follows. In the next post, we'll explore how these requirements inform design decisions, architectural choices, and technology selection.
+
+You'll see how the requirement for "MDX format with frontmatter metadata" led to specific design decisions about content structure, how the "responsive layout" requirement influenced component architecture, and how the "GitHub Pages deployment" requirement shaped the entire build system design.
+
+The beauty of spec-driven development is that each phase builds logically on the previous one. Requirements inform design, design informs tasks, and tasks guide implementation. No more guessing, no more scope creep, no more starting over because you forgot what you were trying to build.
+
+## Key Takeaways
+
+1. **EARS format transforms vague wishes into testable requirements** - Use WHEN/THEN/SHALL structure for clarity
+2. **User stories provide essential context** - Always start with who, what, and why
+3. **Iterative refinement is crucial** - Requirements evolve through feedback and learning
+4. **Structured requirements prevent scope creep** - New ideas must be evaluated against existing requirements
+5. **Requirements become powerful AI context** - Provide rich background for AI-assisted development
+6. **Good requirements save time** - Upfront clarity prevents downstream confusion and rework
+
+Requirements aren't bureaucratic overhead—they're the foundation of intelligent software development. When done right, they accelerate development, improve quality, and ensure everyone is building toward the same vision.
+
+In our next post, we'll see how these requirements transform into comprehensive design documents that guide architectural decisions and technology choices.
+
+---
+
+_This post is part of the "Kiro Spec-Driven Development" series, where we explore how structured specifications transform AI-assisted software development. Follow along as we build a complete personal landing page using this methodology, with full transparency into the process, challenges, and benefits._
+
+**Previous in the series**: [From Vibe Coding to Spec-Driven Development: The Kiro Philosophy](./kiro-spec-driven-development-philosophy)
+
+**Next in the series**: [From Requirements to Architecture: Design-Driven Development](#)
+
+**Series Overview**: [Complete Guide to Spec-Driven Development](#)

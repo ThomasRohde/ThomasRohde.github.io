@@ -70,7 +70,8 @@ export default function RootLayout() {
 
             {/* Copyright */}
             <p className="text-muted-foreground text-sm">
-              © {new Date().getFullYear()} Thomas Rohde. All rights reserved.
+              © {new Date().getFullYear()} Thomas Klok Rohde. All rights
+              reserved.
             </p>
           </div>
         </div>

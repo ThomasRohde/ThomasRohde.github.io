@@ -30,7 +30,7 @@ export const mockBlogPost = {
 };
 
 export const mockPersonalInfo = {
-  name: 'Thomas Rohde',
+  name: 'Thomas Klok Rohde',
   title: 'Software Developer',
   tagline: 'Building amazing web experiences',
   bio: 'Passionate developer with expertise in React and TypeScript',
