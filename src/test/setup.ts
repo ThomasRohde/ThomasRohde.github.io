@@ -12,8 +12,8 @@ expect.extend({ toHaveNoViolations });
 
 // Type declaration for the custom matcher
 declare module 'vitest' {
-  interface Assertion<T = unknown> {
-    toHaveNoViolations(): T;
+  interface Assertion {
+    toHaveNoViolations(): void;
   }
   interface AsymmetricMatchersContaining {
     toHaveNoViolations(): unknown;
