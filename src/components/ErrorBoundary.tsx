@@ -1,117 +1,72 @@
-import { Component } from 'react';
-import type { ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import React from 'react';
+import { logger } from '@/lib/logger';
+import { config } from '@/lib/config';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-}
-
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
-  errorInfo?: ErrorInfo;
+  errorInfo?: React.ErrorInfo;
 }
 
-export default class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+}
+
+class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return {
+      hasError: true,
+      error,
+    };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Log the error
+    logger.error('React Error Boundary caught an error', error, {
+      errorInfo,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Call custom error handler if provided
+    this.props.onError?.(error, errorInfo);
+
+    // Update state with error info
     this.setState({
       error,
       errorInfo,
     });
-
-    // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
-    }
-
-    // In production, you might want to log to an error reporting service
-    // logErrorToService(error, errorInfo)
   }
 
-  handleRetry = () => {
+  resetError = () => {
     this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };
 
   render() {
     if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
+      const { fallback: Fallback } = this.props;
+
+      if (Fallback) {
+        return (
+          <Fallback error={this.state.error} resetError={this.resetError} />
+        );
       }
 
       return (
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <div className="bg-destructive/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
-                <AlertTriangle
-                  className="text-destructive h-6 w-6"
-                  aria-hidden="true"
-                />
-              </div>
-              <CardTitle className="text-xl">Something went wrong</CardTitle>
-              <CardDescription>
-                We encountered an unexpected error. Please try refreshing the
-                page.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {process.env.NODE_ENV === 'development' && this.state.error && (
-                <details className="text-sm">
-                  <summary className="text-muted-foreground hover:text-foreground cursor-pointer font-medium">
-                    Error Details (Development)
-                  </summary>
-                  <div className="bg-muted mt-2 rounded-md p-3">
-                    <p className="font-mono text-xs break-all">
-                      {this.state.error.toString()}
-                    </p>
-                    {this.state.errorInfo && (
-                      <pre className="mt-2 overflow-auto text-xs">
-                        {this.state.errorInfo.componentStack}
-                      </pre>
-                    )}
-                  </div>
-                </details>
-              )}
-
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Button
-                  onClick={this.handleRetry}
-                  className="flex-1"
-                  aria-label="Try again"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Try Again
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => (window.location.href = '/')}
-                  className="flex-1"
-                  aria-label="Go to homepage"
-                >
-                  Go Home
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <DefaultErrorFallback
+          error={this.state.error}
+          resetError={this.resetError}
+        />
       );
     }
 
@@ -119,10 +74,93 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-// Hook-based error boundary for functional components
-export function useErrorHandler() {
-  return (error: Error, errorInfo?: ErrorInfo) => {
-    console.error('Error caught by error handler:', error, errorInfo);
-    // In a real app, you might want to report this to an error service
-  };
+interface ErrorFallbackProps {
+  error?: Error;
+  resetError: () => void;
 }
+
+const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({
+  error,
+  resetError,
+}) => {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg">
+        <div className="mb-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+            <svg
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <h2 className="mb-2 text-lg font-semibold text-gray-900">
+          Something went wrong
+        </h2>
+
+        <p className="mb-4 text-gray-600">
+          We're sorry, but something unexpected happened. The error has been
+          logged and we'll look into it.
+        </p>
+
+        {config.isDevelopment && error && (
+          <details className="mb-4 text-left">
+            <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+              Error Details (Development)
+            </summary>
+            <div className="mt-2 max-h-32 overflow-auto rounded bg-gray-100 p-3 font-mono text-xs text-gray-800">
+              <div className="mb-1 font-semibold">
+                {error.name}: {error.message}
+              </div>
+              {error.stack && (
+                <pre className="whitespace-pre-wrap">{error.stack}</pre>
+              )}
+            </div>
+          </details>
+        )}
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            onClick={resetError}
+            className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+          >
+            Try Again
+          </button>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="flex-1 rounded-md bg-gray-600 px-4 py-2 text-white transition-colors hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
+          >
+            Reload Page
+          </button>
+        </div>
+
+        {config.isDevelopment && (
+          <div className="mt-4 border-t border-gray-200 pt-4">
+            <button
+              onClick={() => {
+                console.log('Error Boundary State:', { error });
+                console.log('Recent Logs:', logger.getLogs());
+              }}
+              className="text-sm text-gray-500 underline hover:text-gray-700"
+            >
+              Debug Info (Console)
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ErrorBoundary;

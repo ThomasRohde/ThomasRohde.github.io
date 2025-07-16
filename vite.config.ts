@@ -39,21 +39,43 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true,
     open: true,
+    cors: true,
     hmr: {
       overlay: true,
+      port: 3001,
+    },
+    watch: {
+      usePolling: false,
+      interval: 100,
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV === 'development',
+    minify: 'terser',
+    target: 'es2020',
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
+          ui: [
+            '@radix-ui/react-slot',
+            '@radix-ui/react-label',
+            '@radix-ui/react-navigation-menu',
+          ],
+          utils: ['clsx', 'tailwind-merge', 'class-variance-authority'],
         },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
+    // Optimize bundle size
+    chunkSizeWarningLimit: 1000,
+    assetsInlineLimit: 4096,
   },
   define: {
     __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
