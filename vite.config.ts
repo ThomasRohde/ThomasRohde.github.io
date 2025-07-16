@@ -37,6 +37,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  assetsInclude: ['**/*.mdx'],
   server: {
     port: 3000,
     host: true,
@@ -85,6 +86,10 @@ export default defineConfig({
               return 'mdx-vendor';
             }
             return 'vendor';
+          }
+          // Group blog-related modules together
+          if (id.includes('/lib/blog') || id.includes('/lib/blogService')) {
+            return 'blog-lib';
           }
           // Split pages into separate chunks
           if (id.includes('/pages/')) {

@@ -5,6 +5,7 @@ import { parseFrontmatter, calculateReadTime, createSlug } from '@/lib/blog';
 const blogModules = import.meta.glob('/src/content/blog/*.mdx', {
   query: '?raw',
   import: 'default',
+  eager: false,
 }) as Record<string, () => Promise<string>>;
 
 // Cache for loaded blog posts
@@ -20,33 +21,45 @@ export async function loadBlogPosts(): Promise<BlogPost[]> {
 
   const posts: BlogPost[] = [];
 
-  for (const [path, loader] of Object.entries(blogModules)) {
-    try {
-      const rawContent = await loader();
-      const { frontmatter, content } = parseFrontmatter(rawContent);
+  try {
+    for (const [path, loader] of Object.entries(blogModules)) {
+      try {
+        const rawContent = await loader();
 
-      // Extract filename for slug
-      const filename = path.split('/').pop()?.replace('.mdx', '') || '';
-      const slug = filename || createSlug(frontmatter.title);
+        if (!rawContent || typeof rawContent !== 'string') {
+          console.warn(`Invalid content for ${path}:`, rawContent);
+          continue;
+        }
 
-      const post: BlogPost = {
-        ...frontmatter,
-        slug,
-        content,
-        readTime: calculateReadTime(content),
-        publishedDate: new Date(frontmatter.publishedDate),
-        updatedDate: frontmatter.updatedDate
-          ? new Date(frontmatter.updatedDate)
-          : undefined,
-      };
+        const { frontmatter, content } = parseFrontmatter(rawContent);
 
-      // Only include published posts
-      if (post.published) {
-        posts.push(post);
+        // Extract filename for slug
+        const filename = path.split('/').pop()?.replace('.mdx', '') || '';
+        const slug = filename || createSlug(frontmatter.title);
+
+        const post: BlogPost = {
+          ...frontmatter,
+          slug,
+          content,
+          readTime: calculateReadTime(content),
+          publishedDate: new Date(frontmatter.publishedDate),
+          updatedDate: frontmatter.updatedDate
+            ? new Date(frontmatter.updatedDate)
+            : undefined,
+        };
+
+        // Only include published posts
+        if (post.published) {
+          posts.push(post);
+        }
+      } catch (error) {
+        console.error(`Error loading blog post from ${path}:`, error);
       }
-    } catch (error) {
-      console.error(`Error loading blog post from ${path}:`, error);
     }
+  } catch (error) {
+    console.error('Error loading blog modules:', error);
+    // Return empty array as fallback
+    return [];
   }
 
   // Sort posts by published date (newest first)
@@ -60,8 +73,13 @@ export async function loadBlogPosts(): Promise<BlogPost[]> {
  * Get a single blog post by slug
  */
 export async function getBlogPost(slug: string): Promise<BlogPost | null> {
-  const posts = await loadBlogPosts();
-  return posts.find((post) => post.slug === slug) || null;
+  try {
+    const posts = await loadBlogPosts();
+    return posts.find((post) => post.slug === slug) || null;
+  } catch (error) {
+    console.error(`Error getting blog post with slug ${slug}:`, error);
+    return null;
+  }
 }
 
 /**
@@ -70,34 +88,54 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
 export async function getBlogPostsByCategory(
   category: string
 ): Promise<BlogPost[]> {
-  const posts = await loadBlogPosts();
-  return posts.filter((post) => post.category === category);
+  try {
+    const posts = await loadBlogPosts();
+    return posts.filter((post) => post.category === category);
+  } catch (error) {
+    console.error(`Error getting blog posts by category ${category}:`, error);
+    return [];
+  }
 }
 
 /**
  * Get blog posts filtered by tag
  */
 export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
-  const posts = await loadBlogPosts();
-  return posts.filter((post) => post.tags.includes(tag));
+  try {
+    const posts = await loadBlogPosts();
+    return posts.filter((post) => post.tags.includes(tag));
+  } catch (error) {
+    console.error(`Error getting blog posts by tag ${tag}:`, error);
+    return [];
+  }
 }
 
 /**
  * Get all unique categories from blog posts
  */
 export async function getBlogCategories(): Promise<string[]> {
-  const posts = await loadBlogPosts();
-  const categories = new Set(posts.map((post) => post.category));
-  return Array.from(categories).sort();
+  try {
+    const posts = await loadBlogPosts();
+    const categories = new Set(posts.map((post) => post.category));
+    return Array.from(categories).sort();
+  } catch (error) {
+    console.error('Error getting blog categories:', error);
+    return [];
+  }
 }
 
 /**
  * Get all unique tags from blog posts
  */
 export async function getBlogTags(): Promise<string[]> {
-  const posts = await loadBlogPosts();
-  const tags = new Set(posts.flatMap((post) => post.tags));
-  return Array.from(tags).sort();
+  try {
+    const posts = await loadBlogPosts();
+    const tags = new Set(posts.flatMap((post) => post.tags));
+    return Array.from(tags).sort();
+  } catch (error) {
+    console.error('Error getting blog tags:', error);
+    return [];
+  }
 }
 
 /**

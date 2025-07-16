@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Analyze and fix circular dependencies
+- [-] 1. Analyze and fix circular dependencies
   - Run dependency analysis to identify circular imports in the codebase
   - Examine import/export patterns in blog-related modules
   - Refactor circular dependencies by extracting shared utilities or using dependency injection

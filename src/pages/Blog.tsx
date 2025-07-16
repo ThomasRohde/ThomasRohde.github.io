@@ -20,9 +20,11 @@ export default function Blog() {
     async function fetchPosts() {
       try {
         setLoading(true);
+        setError(null);
         const blogPosts = await loadBlogPosts();
         setPosts(blogPosts);
       } catch (err) {
+        console.error('Error loading blog posts:', err);
         setError(
           err instanceof Error ? err.message : 'Failed to load blog posts'
         );
@@ -40,14 +42,26 @@ export default function Blog() {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mx-auto max-w-4xl">
-          <h1 className="mb-8 text-4xl font-bold">Blog</h1>
-          <div className="flex items-center justify-center py-12">
-            <div className="text-destructive text-lg">Error: {error}</div>
+      <ErrorBoundary>
+        <div className="container mx-auto px-4 py-8">
+          <div className="mx-auto max-w-4xl">
+            <h1 className="mb-8 text-4xl font-bold">Blog</h1>
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="text-destructive mb-4 text-lg">
+                  Unable to load blog posts: {error}
+                </div>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </ErrorBoundary>
     );
   }
 
