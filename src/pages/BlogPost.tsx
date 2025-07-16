@@ -72,20 +72,28 @@ export default function BlogPost() {
         if (currentPost.series) {
           const seriesNav = await getSeriesNavigation(currentPost);
           setSeriesNavigation(seriesNav);
-        }
 
-        // Get all posts for general navigation
-        const allPosts = await loadBlogPosts();
-        const currentIndex = allPosts.findIndex((p) => p.slug === slug);
+          // Use series navigation for previous/next if available
+          if (seriesNav) {
+            setNavigation({
+              previous: seriesNav.previous,
+              next: seriesNav.next,
+            });
+          }
+        } else {
+          // Get all posts for general navigation (only for non-series posts)
+          const allPosts = await loadBlogPosts();
+          const currentIndex = allPosts.findIndex((p) => p.slug === slug);
 
-        if (currentIndex !== -1) {
-          setNavigation({
-            previous: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
-            next:
-              currentIndex < allPosts.length - 1
-                ? allPosts[currentIndex + 1]
-                : null,
-          });
+          if (currentIndex !== -1) {
+            setNavigation({
+              previous: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
+              next:
+                currentIndex < allPosts.length - 1
+                  ? allPosts[currentIndex + 1]
+                  : null,
+            });
+          }
         }
       } catch (err) {
         setError(
