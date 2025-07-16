@@ -1,0 +1,363 @@
+---
+title: 'Modern CSS Techniques Every Developer Should Know'
+excerpt: 'Explore cutting-edge CSS features and techniques that will elevate your web development skills and create better user experiences.'
+publishedDate: '2025-01-05'
+tags: ['css', 'frontend', 'web-development', 'design']
+category: 'tutorial'
+featuredImage: '/images/css-techniques-cover.jpg'
+published: true
+---
+
+# Modern CSS Techniques Every Developer Should Know
+
+CSS has evolved tremendously in recent years. Here are some modern techniques that will help you create better, more maintainable stylesheets.
+
+## CSS Grid Layout
+
+CSS Grid is perfect for complex layouts:
+
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 2rem;
+  padding: 2rem;
+}
+
+/* Named grid lines */
+.layout {
+  display: grid;
+  grid-template-columns: [sidebar-start] 250px [sidebar-end main-start] 1fr [main-end];
+  grid-template-rows: [header-start] 60px [header-end content-start] 1fr [content-end];
+}
+
+.header {
+  grid-column: sidebar-start / main-end;
+  grid-row: header-start / header-end;
+}
+
+.sidebar {
+  grid-column: sidebar-start / sidebar-end;
+  grid-row: content-start / content-end;
+}
+
+.main {
+  grid-column: main-start / main-end;
+  grid-row: content-start / content-end;
+}
+```
+
+## CSS Custom Properties (Variables)
+
+Use CSS variables for maintainable themes:
+
+```css
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #64748b;
+  --spacing-unit: 1rem;
+  --border-radius: 0.5rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+  --primary-color: #60a5fa;
+  --secondary-color: #94a3b8;
+  --bg-color: #1f2937;
+  --text-color: #f9fafb;
+}
+
+.button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+}
+```
+
+## Container Queries
+
+Style elements based on their container size:
+
+```css
+.card-container {
+  container-type: inline-size;
+  container-name: card;
+}
+
+.card {
+  padding: 1rem;
+}
+
+@container card (min-width: 400px) {
+  .card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    padding: 2rem;
+  }
+
+  .card-image {
+    aspect-ratio: 1;
+  }
+}
+```
+
+## CSS Logical Properties
+
+Use logical properties for better internationalization:
+
+```css
+/* Instead of margin-left and margin-right */
+.element {
+  margin-inline-start: 1rem;
+  margin-inline-end: 2rem;
+
+  /* Instead of margin-top and margin-bottom */
+  margin-block-start: 1rem;
+  margin-block-end: 2rem;
+
+  /* Shorthand */
+  margin-inline: 1rem 2rem;
+  margin-block: 1rem 2rem;
+
+  /* Border */
+  border-inline-start: 2px solid blue;
+  border-block-end: 1px solid gray;
+}
+```
+
+## Advanced Flexbox
+
+Master advanced flexbox techniques:
+
+```css
+/* Flexible spacing */
+.navbar {
+  display: flex;
+  gap: 1rem;
+}
+
+.navbar-brand {
+  margin-inline-end: auto; /* Push everything else to the right */
+}
+
+/* Equal height cards */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card {
+  flex: 1 1 300px; /* grow, shrink, basis */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-content {
+  flex: 1; /* Take up remaining space */
+}
+
+.card-actions {
+  margin-top: auto; /* Push to bottom */
+}
+```
+
+## CSS Subgrid
+
+Use subgrid for complex nested layouts:
+
+```css
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.nested-grid {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: subgrid;
+  gap: inherit;
+}
+```
+
+## Modern Selectors
+
+Use powerful new selectors:
+
+```css
+/* :is() selector */
+:is(h1, h2, h3, h4, h5, h6) {
+  font-family: 'Heading Font', sans-serif;
+  line-height: 1.2;
+}
+
+/* :where() selector (0 specificity) */
+:where(ul, ol) :where(ul, ol) {
+  margin-block: 0;
+}
+
+/* :has() selector (parent selector) */
+.card:has(.card-image) {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.form-group:has(input:invalid) {
+  border-color: red;
+}
+
+/* :not() with multiple selectors */
+button:not(.primary, .secondary) {
+  background: gray;
+}
+```
+
+## CSS Nesting
+
+Write nested CSS (available in modern browsers):
+
+```css
+.card {
+  padding: 1rem;
+  border-radius: 0.5rem;
+
+  & .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  & .card-content {
+    color: #666;
+
+    & p {
+      margin-bottom: 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+```
+
+## CSS Functions
+
+Use powerful CSS functions:
+
+```css
+.responsive-text {
+  /* Fluid typography */
+  font-size: clamp(1rem, 2.5vw, 2rem);
+
+  /* Dynamic calculations */
+  width: calc(100% - 2rem);
+  margin: calc(var(--spacing-unit) * 2);
+
+  /* Minimum and maximum values */
+  width: min(100%, 800px);
+  height: max(200px, 50vh);
+}
+
+.color-mixing {
+  /* Color mixing */
+  background: color-mix(in srgb, blue 30%, white);
+
+  /* Relative colors */
+  --primary: #3b82f6;
+  --primary-light: color-mix(in srgb, var(--primary) 80%, white);
+  --primary-dark: color-mix(in srgb, var(--primary) 80%, black);
+}
+```
+
+## CSS Animations and Transitions
+
+Create smooth, performant animations:
+
+```css
+/* Smooth transitions */
+.button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* CSS animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Scroll-triggered animations */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease-out;
+  }
+
+  .animate-on-scroll.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+```
+
+## Best Practices
+
+1. **Use CSS custom properties** for maintainable themes
+2. **Prefer logical properties** for better internationalization
+3. **Use container queries** instead of media queries when appropriate
+4. **Leverage CSS Grid** for complex layouts
+5. **Use modern selectors** to reduce specificity issues
+6. **Implement proper fallbacks** for newer features
+
+## Browser Support
+
+Always check browser support for new features:
+
+```css
+/* Feature detection with @supports */
+@supports (display: grid) {
+  .layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@supports not (display: grid) {
+  .layout {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+```
+
+## Conclusion
+
+Modern CSS provides powerful tools for creating responsive, maintainable, and performant stylesheets. Start incorporating these techniques into your projects to write better CSS and create superior user experiences.
+
+Remember to always consider browser support and provide appropriate fallbacks for newer features!

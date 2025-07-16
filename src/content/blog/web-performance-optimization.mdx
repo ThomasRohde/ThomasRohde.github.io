@@ -1,0 +1,216 @@
+---
+title: 'Web Performance Optimization: A Complete Guide'
+excerpt: 'Learn essential techniques for optimizing web performance, from image optimization to code splitting and caching strategies.'
+publishedDate: '2025-01-08'
+tags: ['performance', 'optimization', 'web-development', 'frontend']
+category: 'tutorial'
+featuredImage: '/images/performance-optimization-cover.jpg'
+published: true
+---
+
+# Web Performance Optimization: A Complete Guide
+
+Web performance is crucial for user experience and SEO. Here's a comprehensive guide to optimizing your web applications.
+
+## Why Performance Matters
+
+- **User Experience**: Faster sites lead to better user engagement
+- **SEO**: Google considers page speed as a ranking factor
+- **Conversion Rates**: Every 100ms delay can reduce conversions by 1%
+- **Mobile Users**: Performance is even more critical on mobile devices
+
+## Core Web Vitals
+
+Google's Core Web Vitals are essential metrics to track:
+
+### Largest Contentful Paint (LCP)
+
+- **Target**: Under 2.5 seconds
+- **Measures**: Loading performance
+- **Optimization**: Optimize images, use CDN, improve server response time
+
+### First Input Delay (FID)
+
+- **Target**: Under 100 milliseconds
+- **Measures**: Interactivity
+- **Optimization**: Minimize JavaScript, use web workers, optimize third-party code
+
+### Cumulative Layout Shift (CLS)
+
+- **Target**: Under 0.1
+- **Measures**: Visual stability
+- **Optimization**: Set image dimensions, avoid dynamic content injection
+
+## Image Optimization
+
+Images often account for the majority of page weight:
+
+```html
+<!-- Use modern formats -->
+<picture>
+  <source srcset="image.avif" type="image/avif" />
+  <source srcset="image.webp" type="image/webp" />
+  <img src="image.jpg" alt="Description" loading="lazy" />
+</picture>
+
+<!-- Responsive images -->
+<img
+  srcset="small.jpg 480w, medium.jpg 800w, large.jpg 1200w"
+  sizes="(max-width: 480px) 100vw, (max-width: 800px) 50vw, 25vw"
+  src="medium.jpg"
+  alt="Description"
+/>
+```
+
+## Code Splitting
+
+Split your JavaScript bundles to reduce initial load time:
+
+```javascript
+// Dynamic imports for route-based splitting
+const LazyComponent = React.lazy(() => import('./LazyComponent'));
+
+// Component-based splitting
+function App() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LazyComponent />
+    </Suspense>
+  );
+}
+
+// Webpack magic comments for chunk naming
+const utils = import(/* webpackChunkName: "utils" */ './utils');
+```
+
+## Caching Strategies
+
+Implement effective caching for better performance:
+
+```javascript
+// Service Worker caching
+self.addEventListener('fetch', (event) => {
+  if (event.request.destination === 'image') {
+    event.respondWith(
+      caches.open('images').then((cache) => {
+        return cache.match(event.request).then((response) => {
+          return (
+            response ||
+            fetch(event.request).then((fetchResponse) => {
+              cache.put(event.request, fetchResponse.clone());
+              return fetchResponse;
+            })
+          );
+        });
+      })
+    );
+  }
+});
+```
+
+## CSS Optimization
+
+Optimize your CSS for better performance:
+
+```css
+/* Critical CSS - inline above the fold styles */
+.hero {
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Use efficient selectors */
+.button {
+  /* Good */
+}
+div.button {
+  /* Less efficient */
+}
+div > .button {
+  /* Even less efficient */
+}
+
+/* Avoid expensive properties */
+.element {
+  /* Avoid */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+  /* Better - use transform for animations */
+  transform: translateX(10px);
+  will-change: transform;
+}
+```
+
+## JavaScript Optimization
+
+Optimize your JavaScript for better performance:
+
+```javascript
+// Debounce expensive operations
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Use requestAnimationFrame for animations
+function animate() {
+  // Animation logic
+  requestAnimationFrame(animate);
+}
+
+// Optimize DOM queries
+const elements = document.querySelectorAll('.item');
+const fragment = document.createDocumentFragment();
+
+elements.forEach((element) => {
+  // Batch DOM operations
+  fragment.appendChild(element.cloneNode(true));
+});
+
+document.body.appendChild(fragment);
+```
+
+## Performance Monitoring
+
+Monitor your performance with tools:
+
+```javascript
+// Performance API
+const observer = new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) {
+    console.log(entry.name, entry.startTime, entry.duration);
+  }
+});
+
+observer.observe({ entryTypes: ['measure', 'navigation'] });
+
+// Web Vitals
+import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+
+getCLS(console.log);
+getFID(console.log);
+getFCP(console.log);
+getLCP(console.log);
+getTTFB(console.log);
+```
+
+## Tools and Resources
+
+- **Lighthouse**: Automated performance auditing
+- **WebPageTest**: Detailed performance analysis
+- **Chrome DevTools**: Built-in performance profiling
+- **Bundle Analyzer**: Analyze bundle size and composition
+
+## Conclusion
+
+Web performance optimization is an ongoing process. Start with measuring your current performance, identify bottlenecks, and implement optimizations incrementally. Remember that performance improvements should be data-driven and user-focused.
+
+Keep monitoring and optimizing to ensure your users have the best possible experience!
