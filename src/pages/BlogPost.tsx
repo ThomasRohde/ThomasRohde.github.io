@@ -13,7 +13,7 @@ import {
   loadBlogPosts,
   getSeriesNavigation,
 } from '@/lib/blogService';
-import { formatDate, extractTableOfContents } from '@/lib/blog';
+import { formatDate } from '@/lib/blog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -27,11 +27,9 @@ import { generateBlogPostSEO, seoConfig } from '@/lib/seo';
 import { BlogPostSkeleton } from '@/components/LoadingSpinner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { SeriesNavigation } from '@/components/SeriesNavigation';
-import { TableOfContents } from '@/components/TableOfContents';
 import type {
   BlogPost as BlogPostType,
   SeriesNavigation as SeriesNavigationType,
-  TocEntry,
 } from '@/types/blog';
 import { MDXRenderer } from '@/components/MDXRenderer';
 
@@ -47,7 +45,6 @@ export default function BlogPost() {
   }>({ previous: null, next: null });
   const [seriesNavigation, setSeriesNavigation] =
     useState<SeriesNavigationType | null>(null);
-  const [tableOfContents, setTableOfContents] = useState<TocEntry[]>([]);
 
   useEffect(() => {
     async function fetchPost() {
@@ -70,10 +67,6 @@ export default function BlogPost() {
         }
 
         setPost(currentPost);
-
-        // Extract table of contents
-        const toc = extractTableOfContents(currentPost.content);
-        setTableOfContents(toc);
 
         // Get series navigation if post is part of a series
         if (currentPost.series) {
@@ -210,27 +203,10 @@ export default function BlogPost() {
             </>
           )}
 
-          {/* Main content area with sidebar */}
-          <div className="grid gap-8 lg:grid-cols-4">
-            {/* Main content */}
-            <div className="lg:col-span-3">
-              <article className="prose prose-lg dark:prose-invert max-w-none">
-                <MDXRenderer content={post.content} />
-              </article>
-            </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-8 space-y-6">
-                {/* Table of contents */}
-                {tableOfContents.length > 0 && (
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <TableOfContents entries={tableOfContents} />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          {/* Main content */}
+          <article className="prose prose-lg dark:prose-invert max-w-none">
+            <MDXRenderer content={post.content} />
+          </article>
 
           <Separator className="my-12" />
 
