@@ -1,8 +1,8 @@
-import { getCLS, getFID, getFCP, getLCP, getTTFB, Metric } from 'web-vitals';
+import { onCLS, onINP, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
 
 export interface PerformanceMetrics {
   cls?: number;
-  fid?: number;
+  inp?: number; // INP replaced FID in web-vitals v4
   fcp?: number;
   lcp?: number;
   ttfb?: number;
@@ -10,7 +10,7 @@ export interface PerformanceMetrics {
 
 export interface PerformanceThresholds {
   cls: { good: number; needsImprovement: number };
-  fid: { good: number; needsImprovement: number };
+  inp: { good: number; needsImprovement: number }; // INP replaced FID
   fcp: { good: number; needsImprovement: number };
   lcp: { good: number; needsImprovement: number };
   ttfb: { good: number; needsImprovement: number };
@@ -19,7 +19,7 @@ export interface PerformanceThresholds {
 // Web Vitals thresholds (in milliseconds, except CLS which is unitless)
 export const PERFORMANCE_THRESHOLDS: PerformanceThresholds = {
   cls: { good: 0.1, needsImprovement: 0.25 },
-  fid: { good: 100, needsImprovement: 300 },
+  inp: { good: 200, needsImprovement: 500 }, // INP thresholds
   fcp: { good: 1800, needsImprovement: 3000 },
   lcp: { good: 2500, needsImprovement: 4000 },
   ttfb: { good: 800, needsImprovement: 1800 },
@@ -51,11 +51,11 @@ export class PerformanceMonitor {
   }
 
   private initializeWebVitals() {
-    getCLS(this.handleMetric.bind(this));
-    getFID(this.handleMetric.bind(this));
-    getFCP(this.handleMetric.bind(this));
-    getLCP(this.handleMetric.bind(this));
-    getTTFB(this.handleMetric.bind(this));
+    onCLS(this.handleMetric.bind(this));
+    onINP(this.handleMetric.bind(this)); // INP replaced FID in web-vitals v4
+    onFCP(this.handleMetric.bind(this));
+    onLCP(this.handleMetric.bind(this));
+    onTTFB(this.handleMetric.bind(this));
   }
 
   private handleMetric(metric: Metric) {
@@ -87,7 +87,7 @@ export class PerformanceMonitor {
     const ratings: Record<keyof PerformanceMetrics, PerformanceRating | null> =
       {
         cls: null,
-        fid: null,
+        inp: null, // Updated from fid to inp
         fcp: null,
         lcp: null,
         ttfb: null,
@@ -121,8 +121,29 @@ export class PerformanceMonitor {
   }
 }
 
-// Singleton instance
-export const performanceMonitor = new PerformanceMonitor();
+// Singleton instance - lazy initialization to avoid issues with mocking
+let performanceMonitorInstance: PerformanceMonitor | null = null;
+
+export const performanceMonitor = {
+  getInstance(): PerformanceMonitor {
+    if (!performanceMonitorInstance) {
+      performanceMonitorInstance = new PerformanceMonitor();
+    }
+    return performanceMonitorInstance;
+  },
+  onMetricsUpdate(callback: (metrics: PerformanceMetrics) => void) {
+    return this.getInstance().onMetricsUpdate(callback);
+  },
+  getMetrics() {
+    return this.getInstance().getMetrics();
+  },
+  getMetricRatings() {
+    return this.getInstance().getMetricRatings();
+  },
+  logPerformanceReport() {
+    return this.getInstance().logPerformanceReport();
+  },
+};
 
 // Utility function to measure custom performance
 export function measurePerformance<T>(name: string, fn: () => T): T {

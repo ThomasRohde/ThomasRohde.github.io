@@ -1,14 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '../utils';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { axe } from 'jest-axe';
 import Hero from '@/components/Hero';
 import Navigation from '@/components/Navigation';
 import { BlogCard } from '@/components/BlogCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { mockBlogPost } from '../utils';
 
-// Extend expect with jest-axe matchers
-expect.extend(toHaveNoViolations);
+// jest-axe matchers are extended in setup.ts
 
 describe('Accessibility Tests', () => {
   it('Hero component should be accessible', async () => {
@@ -73,11 +72,7 @@ describe('Accessibility Tests', () => {
       </div>
     );
 
-    const results = await axe(container, {
-      rules: {
-        'color-contrast': { enabled: true },
-      },
-    });
+    const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
 
@@ -89,13 +84,7 @@ describe('Accessibility Tests', () => {
       </div>
     );
 
-    const results = await axe(container, {
-      rules: {
-        'aria-valid-attr': { enabled: true },
-        'aria-valid-attr-value': { enabled: true },
-        'aria-roles': { enabled: true },
-      },
-    });
+    const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
 });

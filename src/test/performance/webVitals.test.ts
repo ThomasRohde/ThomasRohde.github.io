@@ -1,14 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 // Mock web-vitals functions
-vi.mock('web-vitals', () => ({
-  getCLS: vi.fn(),
-  getFID: vi.fn(),
-  getFCP: vi.fn(),
-  getLCP: vi.fn(),
-  getTTFB: vi.fn(),
-}));
+vi.mock('web-vitals', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual,
+    onCLS: vi.fn(),
+    onINP: vi.fn(),
+    onFCP: vi.fn(),
+    onLCP: vi.fn(),
+    onTTFB: vi.fn(),
+  };
+});
 
 describe('Web Vitals Performance Tests', () => {
   beforeEach(() => {
@@ -17,37 +21,37 @@ describe('Web Vitals Performance Tests', () => {
 
   it('should measure Cumulative Layout Shift (CLS)', () => {
     const mockCallback = vi.fn();
-    getCLS(mockCallback);
+    onCLS(mockCallback);
 
-    expect(getCLS).toHaveBeenCalledWith(mockCallback);
+    expect(onCLS).toHaveBeenCalledWith(mockCallback);
   });
 
-  it('should measure First Input Delay (FID)', () => {
+  it('should measure Interaction to Next Paint (INP)', () => {
     const mockCallback = vi.fn();
-    getFID(mockCallback);
+    onINP(mockCallback);
 
-    expect(getFID).toHaveBeenCalledWith(mockCallback);
+    expect(onINP).toHaveBeenCalledWith(mockCallback);
   });
 
   it('should measure First Contentful Paint (FCP)', () => {
     const mockCallback = vi.fn();
-    getFCP(mockCallback);
+    onFCP(mockCallback);
 
-    expect(getFCP).toHaveBeenCalledWith(mockCallback);
+    expect(onFCP).toHaveBeenCalledWith(mockCallback);
   });
 
   it('should measure Largest Contentful Paint (LCP)', () => {
     const mockCallback = vi.fn();
-    getLCP(mockCallback);
+    onLCP(mockCallback);
 
-    expect(getLCP).toHaveBeenCalledWith(mockCallback);
+    expect(onLCP).toHaveBeenCalledWith(mockCallback);
   });
 
   it('should measure Time to First Byte (TTFB)', () => {
     const mockCallback = vi.fn();
-    getTTFB(mockCallback);
+    onTTFB(mockCallback);
 
-    expect(getTTFB).toHaveBeenCalledWith(mockCallback);
+    expect(onTTFB).toHaveBeenCalledWith(mockCallback);
   });
 
   it('should handle web vitals callback with proper data structure', () => {

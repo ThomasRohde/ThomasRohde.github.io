@@ -21,19 +21,19 @@ describe('Performance utilities', () => {
     it('should return "good" for values within good threshold', () => {
       expect(getPerformanceRating('lcp', 2000)).toBe('good');
       expect(getPerformanceRating('cls', 0.05)).toBe('good');
-      expect(getPerformanceRating('fid', 50)).toBe('good');
+      expect(getPerformanceRating('inp', 50)).toBe('good');
     });
 
     it('should return "needs-improvement" for values within needs improvement threshold', () => {
       expect(getPerformanceRating('lcp', 3000)).toBe('needs-improvement');
       expect(getPerformanceRating('cls', 0.15)).toBe('needs-improvement');
-      expect(getPerformanceRating('fid', 200)).toBe('needs-improvement');
+      expect(getPerformanceRating('inp', 200)).toBe('needs-improvement');
     });
 
     it('should return "poor" for values above needs improvement threshold', () => {
       expect(getPerformanceRating('lcp', 5000)).toBe('poor');
       expect(getPerformanceRating('cls', 0.3)).toBe('poor');
-      expect(getPerformanceRating('fid', 400)).toBe('poor');
+      expect(getPerformanceRating('inp', 400)).toBe('poor');
     });
   });
 
@@ -82,7 +82,7 @@ describe('Performance utilities', () => {
 
       expect(ratings.lcp).toBe('good');
       expect(ratings.cls).toBe('good');
-      expect(ratings.fid).toBe('good');
+      expect(ratings.inp).toBe('good');
     });
   });
 
@@ -142,8 +142,8 @@ describe('Performance utilities', () => {
       expect(PERFORMANCE_THRESHOLDS.lcp.needsImprovement).toBe(4000);
       expect(PERFORMANCE_THRESHOLDS.cls.good).toBe(0.1);
       expect(PERFORMANCE_THRESHOLDS.cls.needsImprovement).toBe(0.25);
-      expect(PERFORMANCE_THRESHOLDS.fid.good).toBe(100);
-      expect(PERFORMANCE_THRESHOLDS.fid.needsImprovement).toBe(300);
+      expect(PERFORMANCE_THRESHOLDS.inp.good).toBe(200);
+      expect(PERFORMANCE_THRESHOLDS.inp.needsImprovement).toBe(500);
     });
   });
 });
