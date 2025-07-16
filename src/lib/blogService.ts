@@ -8,11 +8,15 @@ let blogModules: Record<string, string> = {};
 // Safe module loading with error handling
 function loadBlogModules(): Record<string, string> {
   try {
-    return import.meta.glob('/src/content/blog/*.mdx', {
+    console.log('Loading blog modules...');
+    const modules = import.meta.glob('/src/content/blog/*.mdx', {
       query: '?raw',
       import: 'default',
       eager: true,
     }) as Record<string, string>;
+    console.log('Blog modules loaded:', Object.keys(modules).length, 'files');
+    console.log('Module paths:', Object.keys(modules));
+    return modules;
   } catch (error) {
     console.error('Failed to load blog modules:', error);
     return {};
@@ -34,7 +38,10 @@ let blogPostsCache: BlogPost[] | null = null;
  * Load all blog posts from MDX files
  */
 export async function loadBlogPosts(): Promise<BlogPost[]> {
+  console.log('loadBlogPosts called, cache exists:', !!blogPostsCache);
+
   if (blogPostsCache) {
+    console.log('Returning cached posts:', blogPostsCache.length);
     return blogPostsCache;
   }
 
@@ -42,19 +49,36 @@ export async function loadBlogPosts(): Promise<BlogPost[]> {
 
   try {
     // Check if we have any blog modules
+    console.log(
+      'Checking blog modules, count:',
+      Object.keys(blogModules).length
+    );
     if (!blogModules || Object.keys(blogModules).length === 0) {
       console.warn('No blog modules found');
       return [];
     }
 
+    console.log('Processing blog modules...');
     for (const [path, rawContent] of Object.entries(blogModules)) {
       try {
+        console.log(
+          `Processing ${path}, content type:`,
+          typeof rawContent,
+          'length:',
+          rawContent?.length
+        );
+
         if (!rawContent || typeof rawContent !== 'string') {
           console.warn(`Invalid content for ${path}:`, rawContent);
           continue;
         }
 
         const { frontmatter, content } = parseFrontmatter(rawContent);
+        console.log(`Parsed frontmatter for ${path}:`, {
+          title: frontmatter.title,
+          published: frontmatter.published,
+          publishedDate: frontmatter.publishedDate,
+        });
 
         // Extract filename for slug
         const filename = path.split('/').pop()?.replace('.mdx', '') || '';
@@ -71,9 +95,18 @@ export async function loadBlogPosts(): Promise<BlogPost[]> {
             : undefined,
         };
 
+        console.log(`Created post object for ${path}:`, {
+          slug: post.slug,
+          title: post.title,
+          published: post.published,
+        });
+
         // Only include published posts
         if (post.published) {
           posts.push(post);
+          console.log(`Added published post: ${post.title}`);
+        } else {
+          console.log(`Skipped unpublished post: ${post.title}`);
         }
       } catch (error) {
         console.error(`Error loading blog post from ${path}:`, error);
@@ -85,10 +118,13 @@ export async function loadBlogPosts(): Promise<BlogPost[]> {
     return [];
   }
 
+  console.log('Total posts processed:', posts.length);
+
   // Sort posts by published date (newest first)
   posts.sort((a, b) => b.publishedDate.getTime() - a.publishedDate.getTime());
 
   blogPostsCache = posts;
+  console.log('Posts cached, returning:', posts.length);
   return posts;
 }
 

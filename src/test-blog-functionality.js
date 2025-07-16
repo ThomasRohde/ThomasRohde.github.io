@@ -1,38 +1,27 @@
-// Simple test to verify blog functionality
-import { getAllPosts, getPostBySlug } from './lib/blog.js';
+// Test script to debug blog functionality
+import { loadBlogPosts } from './lib/blogService.js';
 
-async function testBlogFunctionality() {
-  console.log('Testing blog functionality...');
+console.log('Testing blog post loading...');
 
+async function testBlogLoading() {
   try {
-    // Test getting all posts
-    const posts = await getAllPosts();
-    console.log(`✓ Found ${posts.length} blog posts`);
+    console.log('Calling loadBlogPosts()...');
+    const posts = await loadBlogPosts();
+    console.log('Posts loaded:', posts.length);
 
-    // Test individual post loading
     if (posts.length > 0) {
-      const firstPost = posts[0];
-      console.log(`✓ First post: "${firstPost.title}"`);
-      console.log(`✓ Published: ${firstPost.publishedDate}`);
-      console.log(`✓ Tags: ${firstPost.tags.join(', ')}`);
-
-      // Test getting post by slug
-      const postContent = await getPostBySlug(firstPost.slug);
-      if (postContent) {
-        console.log(
-          `✓ Successfully loaded post content for "${firstPost.slug}"`
-        );
-        console.log(
-          `✓ Content length: ${postContent.content.length} characters`
-        );
-      }
+      console.log('First post:', {
+        title: posts[0].title,
+        slug: posts[0].slug,
+        published: posts[0].published,
+        publishedDate: posts[0].publishedDate,
+      });
+    } else {
+      console.log('No posts found!');
     }
-
-    console.log('✓ All blog functionality tests passed!');
   } catch (error) {
-    console.error('✗ Blog functionality test failed:', error);
+    console.error('Error loading posts:', error);
   }
 }
 
-// Run the test
-testBlogFunctionality();
+testBlogLoading();

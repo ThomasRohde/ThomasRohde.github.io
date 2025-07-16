@@ -107,17 +107,93 @@ export function parseFrontmatter(content: string): {
 
   const [, frontmatterYaml, mdxContent] = match;
 
-  // Simple YAML parser for frontmatter (basic key-value pairs)
+  // Enhanced YAML parser for frontmatter
   const frontmatterObj: Record<string, unknown> = {};
+  const lines = frontmatterYaml.split('\n');
+  let i = 0;
 
-  frontmatterYaml.split('\n').forEach((line) => {
-    const trimmedLine = line.trim();
-    if (trimmedLine && !trimmedLine.startsWith('#')) {
-      const colonIndex = trimmedLine.indexOf(':');
-      if (colonIndex > 0) {
-        const key = trimmedLine.substring(0, colonIndex).trim();
-        let value = trimmedLine.substring(colonIndex + 1).trim();
+  while (i < lines.length) {
+    const line = lines[i].trim();
 
+    // Skip empty lines and comments
+    if (!line || line.startsWith('#')) {
+      i++;
+      continue;
+    }
+
+    const colonIndex = line.indexOf(':');
+    if (colonIndex > 0) {
+      const key = line.substring(0, colonIndex).trim();
+      let value = line.substring(colonIndex + 1).trim();
+
+      // Handle multi-line arrays - check if next line starts with '['
+      if (
+        value === '' &&
+        i + 1 < lines.length &&
+        lines[i + 1].trim().startsWith('[')
+      ) {
+        // Move to the array start line
+        i++;
+        let arrayContent = lines[i].trim();
+
+        // If the array doesn't close on the same line, collect subsequent lines
+        if (!arrayContent.endsWith(']')) {
+          i++;
+          while (i < lines.length) {
+            const nextLine = lines[i].trim();
+            arrayContent += ' ' + nextLine;
+            if (nextLine.endsWith(']')) {
+              break;
+            }
+            i++;
+          }
+        }
+
+        // Parse the complete array
+        if (arrayContent.startsWith('[') && arrayContent.endsWith(']')) {
+          const innerContent = arrayContent.slice(1, -1);
+          if (innerContent.trim()) {
+            frontmatterObj[key] = innerContent
+              .split(',')
+              .map((item) => item.trim().replace(/^["']|["']$/g, ''))
+              .filter((item) => item.length > 0);
+          } else {
+            frontmatterObj[key] = [];
+          }
+        }
+      }
+      // Handle single-line arrays
+      else if (value.startsWith('[')) {
+        let arrayContent = value;
+
+        // If the array doesn't close on the same line, collect subsequent lines
+        if (!value.endsWith(']')) {
+          i++;
+          while (i < lines.length) {
+            const nextLine = lines[i].trim();
+            arrayContent += ' ' + nextLine;
+            if (nextLine.endsWith(']')) {
+              break;
+            }
+            i++;
+          }
+        }
+
+        // Parse the complete array
+        if (arrayContent.startsWith('[') && arrayContent.endsWith(']')) {
+          const innerContent = arrayContent.slice(1, -1);
+          if (innerContent.trim()) {
+            frontmatterObj[key] = innerContent
+              .split(',')
+              .map((item) => item.trim().replace(/^["']|["']$/g, ''))
+              .filter((item) => item.length > 0);
+          } else {
+            frontmatterObj[key] = [];
+          }
+        }
+      }
+      // Handle regular values
+      else {
         // Remove quotes if present
         if (
           (value.startsWith('"') && value.endsWith('"')) ||
@@ -126,19 +202,8 @@ export function parseFrontmatter(content: string): {
           value = value.slice(1, -1);
         }
 
-        // Parse arrays (simple format: [item1, item2])
-        if (value.startsWith('[') && value.endsWith(']')) {
-          const arrayContent = value.slice(1, -1);
-          if (arrayContent.trim()) {
-            frontmatterObj[key] = arrayContent
-              .split(',')
-              .map((item) => item.trim().replace(/^["']|["']$/g, ''));
-          } else {
-            frontmatterObj[key] = [];
-          }
-        }
         // Parse numbers
-        else if (/^\d+$/.test(value)) {
+        if (/^\d+$/.test(value)) {
           frontmatterObj[key] = parseInt(value, 10);
         }
         // Parse booleans
@@ -151,7 +216,14 @@ export function parseFrontmatter(content: string): {
         }
       }
     }
-  });
+
+    i++;
+  }
+
+  // Ensure tags is always an array (fallback for parsing issues)
+  if (typeof frontmatterObj.tags === 'string') {
+    frontmatterObj.tags = [];
+  }
 
   const frontmatter = BlogPostFrontmatterSchema.parse(frontmatterObj);
 
