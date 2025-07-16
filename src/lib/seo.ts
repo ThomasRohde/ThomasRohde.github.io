@@ -19,25 +19,16 @@ export const seoConfig: SEOConfig = {
   siteName: 'Thomas Rohde',
   siteUrl: 'https://thomasrohde.github.io',
   author: {
-    name: 'Thomas Rohde',
-    email: 'thomas@thomasrohde.com',
-    twitter: '@thomasrohde',
+    name: 'Thomas Klok Rohde',
+    email: 'thomas@rohde.name',
+    twitter: '@trohde',
     github: 'https://github.com/thomasrohde',
-    linkedin: 'https://linkedin.com/in/thomasrohde',
+    linkedin: 'https://linkedin.com/in/throhde',
   },
   defaultImage: '/images/og-image.jpg',
   defaultDescription:
     'Personal portfolio and blog of Thomas Rohde, a passionate full stack developer sharing insights on modern web development, React, TypeScript, and more.',
-  defaultKeywords: [
-    'Thomas Rohde',
-    'Full Stack Developer',
-    'React',
-    'TypeScript',
-    'Web Development',
-    'JavaScript',
-    'Frontend',
-    'Backend',
-  ],
+  defaultKeywords: ['Thomas Klok Rohde', 'Enterprise Architect'],
 };
 
 /**
@@ -168,17 +159,8 @@ export function generateOrganizationStructuredData() {
     sameAs: [seoConfig.author.github, seoConfig.author.linkedin].filter(
       Boolean
     ),
-    jobTitle: 'Full Stack Developer',
+    jobTitle: 'Entrprise Architect',
     description: seoConfig.defaultDescription,
-    knowsAbout: [
-      'Web Development',
-      'React',
-      'TypeScript',
-      'JavaScript',
-      'Node.js',
-      'Frontend Development',
-      'Backend Development',
-      'Full Stack Development',
-    ],
+    knowsAbout: ['Enterprise Architecture'],
   };
 }

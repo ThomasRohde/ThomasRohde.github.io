@@ -178,8 +178,8 @@ export function createBlogPostStructuredData(
     url: baseUrl,
     sameAs: [
       'https://github.com/thomasrohde',
-      'https://linkedin.com/in/thomasrohde',
-      'https://twitter.com/thomasrohde',
+      'https://linkedin.com/in/throhde',
+      'https://twitter.com/trohde',
     ],
     jobTitle: 'Full Stack Developer',
     description:

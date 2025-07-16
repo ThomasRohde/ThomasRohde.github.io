@@ -42,11 +42,7 @@ export default function Hero() {
             designs.
           </p>
 
-          <nav
-            className="flex flex-col items-center justify-center gap-4 sm:flex-row"
-            aria-label="Quick navigation"
-            role="navigation"
-          >
+          <div className="flex justify-center">
             <Button
               size="lg"
               onClick={() => scrollToSection('about')}
@@ -59,35 +55,7 @@ export default function Hero() {
             <span id="about-description" className="sr-only">
               Navigate to the about section to learn more about Thomas Rohde
             </span>
-
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => scrollToSection('skills')}
-              onKeyDown={(e) => handleKeyDown(e, 'skills')}
-              className="min-w-[160px]"
-              aria-describedby="skills-description"
-            >
-              View Skills
-            </Button>
-            <span id="skills-description" className="sr-only">
-              Navigate to the skills section to view technical expertise
-            </span>
-
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => scrollToSection('experience')}
-              onKeyDown={(e) => handleKeyDown(e, 'experience')}
-              className="min-w-[160px]"
-              aria-describedby="experience-description"
-            >
-              Experience
-            </Button>
-            <span id="experience-description" className="sr-only">
-              Navigate to the experience section to view work history
-            </span>
-          </nav>
+          </div>
         </div>
       </div>
     </section>

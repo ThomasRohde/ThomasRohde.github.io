@@ -38,7 +38,7 @@ export const mockPersonalInfo = {
   email: 'thomas@example.com',
   social: {
     github: 'https://github.com/thomasrohde',
-    linkedin: 'https://linkedin.com/in/thomasrohde',
+    linkedin: 'https://linkedin.com/in/throhde',
   },
 };
 

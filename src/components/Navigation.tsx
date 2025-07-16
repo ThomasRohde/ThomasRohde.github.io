@@ -19,9 +19,6 @@ export default function Navigation() {
   const navigationItems = [
     { name: 'Home', href: '/', section: 'hero' },
     { name: 'About', href: '/', section: 'about' },
-    { name: 'Skills', href: '/', section: 'skills' },
-    { name: 'Experience', href: '/', section: 'experience' },
-    { name: 'Contact', href: '/', section: 'contact' },
     { name: 'Blog', href: '/blog' },
   ];
 
