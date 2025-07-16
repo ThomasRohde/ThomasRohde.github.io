@@ -2,11 +2,30 @@ import type { BlogPost } from '@/types/blog';
 import { parseFrontmatter, calculateReadTime, createSlug } from '@/lib/blog';
 
 // Blog post modules - this will be populated by Vite's glob import
-const blogModules = import.meta.glob('/src/content/blog/*.mdx', {
-  query: '?raw',
-  import: 'default',
-  eager: false,
-}) as Record<string, () => Promise<string>>;
+// Using eager loading to avoid temporal dead zone issues in production
+let blogModules: Record<string, string> = {};
+
+// Safe module loading with error handling
+function loadBlogModules(): Record<string, string> {
+  try {
+    return import.meta.glob('/src/content/blog/*.mdx', {
+      query: '?raw',
+      import: 'default',
+      eager: true,
+    }) as Record<string, string>;
+  } catch (error) {
+    console.error('Failed to load blog modules:', error);
+    return {};
+  }
+}
+
+// Initialize modules
+try {
+  blogModules = loadBlogModules();
+} catch (error) {
+  console.error('Error during blog module initialization:', error);
+  blogModules = {};
+}
 
 // Cache for loaded blog posts
 let blogPostsCache: BlogPost[] | null = null;
@@ -22,10 +41,14 @@ export async function loadBlogPosts(): Promise<BlogPost[]> {
   const posts: BlogPost[] = [];
 
   try {
-    for (const [path, loader] of Object.entries(blogModules)) {
-      try {
-        const rawContent = await loader();
+    // Check if we have any blog modules
+    if (!blogModules || Object.keys(blogModules).length === 0) {
+      console.warn('No blog modules found');
+      return [];
+    }
 
+    for (const [path, rawContent] of Object.entries(blogModules)) {
+      try {
         if (!rawContent || typeof rawContent !== 'string') {
           console.warn(`Invalid content for ${path}:`, rawContent);
           continue;

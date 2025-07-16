@@ -87,8 +87,12 @@ export default defineConfig({
             }
             return 'vendor';
           }
-          // Group blog-related modules together
+          // Group blog-related modules together but ensure proper initialization
           if (id.includes('/lib/blog') || id.includes('/lib/blogService')) {
+            return 'blog-lib';
+          }
+          // Group content modules with blog-lib to ensure proper loading order
+          if (id.includes('/content/blog')) {
             return 'blog-lib';
           }
           // Split pages into separate chunks
